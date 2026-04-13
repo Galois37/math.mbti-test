@@ -12,10 +12,10 @@
             --bg-color: #eef4f9;
         }
 
+        /* 基础样式 */
         body, html {
             margin: 0; padding: 0;
             width: 100%;
-            /* 允许自然滚动，不再强行固定高度 */
             font-family: "Times New Roman", "Source Han Serif CN", serif;
             background-color: var(--bg-color);
             color: var(--primary-color);
@@ -24,179 +24,139 @@
             -webkit-font-smoothing: antialiased;
         }
 
-        /* 顶部公式：给足间距，营造长图顶部的呼吸感 */
-        .top-formula {
-            margin-top: 60px; /* 增加顶部留白 */
-            margin-bottom: 20px;
-            font-size: 1.2rem;
-            opacity: 0.6;
-        }
-
-        /* MBTI 头部区 */
-        .header-section {
-            text-align: center;
-            margin-bottom: 50px;
-        }
-
-        .mbti-logo {
-            font-size: 3rem;
-            font-weight: 900;
-            letter-spacing: 8px;
-            margin: 0;
-            display: flex; align-items: center; justify-content: center; gap: 12px;
-        }
-
+        /* --- 首页样式 (保持长截屏设计) --- */
+        .top-formula { margin-top: 60px; margin-bottom: 20px; font-size: 1.2rem; opacity: 0.6; }
+        .header-section { text-align: center; margin-bottom: 50px; }
+        .mbti-logo { font-size: 3rem; font-weight: 900; letter-spacing: 8px; margin: 0; display: flex; align-items: center; justify-content: center; gap: 12px; }
         .mobius-svg { width: 50px; height: 50px; opacity: 0.9; }
-
-        .mbti-sub {
-            font-size: 1rem;
-            letter-spacing: 3px;
-            color: #7f8c8d;
-            margin-top: 8px;
-        }
-
-        .author {
-            font-size: 0.9rem;
-            color: #bdc3c7;
-            margin-top: 8px;
-        }
-
-        /* 中央主卡片：参考长图中的悬浮感 */
-        .main-card {
-            width: 88%;
-            max-width: 520px;
-            background: rgba(255, 255, 255, 0.75);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-radius: 28px;
-            padding: 50px 30px;
-            text-align: center;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.04);
-            margin-bottom: 40px; /* 与下方公式拉开距离 */
-        }
-
-        .title {
-            font-size: 2.8rem;
-            font-weight: 800;
-            margin: 0 0 12px 0;
-            letter-spacing: 4px;
-            line-height: 1.2;
-        }
-
-        .subtitle {
-            font-size: 1.1rem;
-            font-style: italic;
-            color: #5d6d7e;
-            margin-bottom: 40px;
-        }
-
-        .intro-text {
-            font-size: 1.1rem;
-            line-height: 2;
-            text-align: justify;
-            margin-bottom: 45px;
-            color: #34495e;
-        }
-
-        .badge-group {
-            display: flex; justify-content: center; gap: 15px; margin-bottom: 50px;
-        }
-
-        .badge {
-            background: rgba(238, 244, 249, 0.9);
-            padding: 10px 18px;
-            border-radius: 20px;
-            font-size: 0.95rem;
-            border: 1px solid rgba(255,255,255,0.5);
-        }
-
-        /* 按钮与下方公式区 */
-        .btn-area {
-            display: flex; flex-direction: column; align-items: center;
-        }
-
-        .start-btn {
-            background: transparent;
-            border: 1.8px solid var(--primary-color);
-            padding: 20px 0;
-            width: 100%; max-width: 300px;
-            cursor: pointer;
-            transition: 0.3s;
-            outline: none;
-            -webkit-tap-highlight-color: transparent;
-            margin-bottom: 40px; /* 给下方的伽罗瓦公式留出空间 */
-        }
-
-        .start-btn:active { background: var(--primary-color); color: white; transform: scale(0.98); }
-
+        .mbti-sub { font-size: 1rem; letter-spacing: 3px; color: #7f8c8d; margin-top: 8px; }
+        .author { font-size: 0.9rem; color: #bdc3c7; margin-top: 8px; }
+        .main-card { width: 88%; max-width: 520px; background: rgba(255, 255, 255, 0.75); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-radius: 28px; padding: 50px 30px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.04); margin-bottom: 40px; }
+        .title { font-size: 2.8rem; font-weight: 800; margin: 0 0 12px 0; letter-spacing: 4px; line-height: 1.2; }
+        .subtitle { font-size: 1.1rem; font-style: italic; color: #5d6d7e; margin-bottom: 40px; }
+        .intro-text { font-size: 1.1rem; line-height: 2; text-align: justify; margin-bottom: 45px; color: #34495e; }
+        .badge-group { display: flex; justify-content: center; gap: 15px; margin-bottom: 50px; }
+        .badge { background: rgba(238, 244, 249, 0.9); padding: 10px 18px; border-radius: 20px; font-size: 0.95rem; border: 1px solid rgba(255,255,255,0.5); }
+        .start-btn { background: transparent; border: 1.8px solid var(--primary-color); padding: 20px 0; width: 100%; max-width: 300px; cursor: pointer; transition: 0.3s; outline: none; -webkit-tap-highlight-color: transparent; margin-bottom: 40px; }
         .btn-main { display: block; font-size: 1.5rem; font-weight: bold; letter-spacing: 2px; }
-        .btn-sub { display: block; font-size: 0.7rem; text-transform: uppercase; margin-top: 6px; letter-spacing: 1px; }
+        .btn-sub { display: block; font-size: 0.7rem; text-transform: uppercase; margin-top: 6px; }
+        .bottom-formula { font-size: 1.3rem; opacity: 0.6; margin-bottom: 20px; }
+        .disclaimer { font-size: 0.85rem; color: #95a5a6; font-style: italic; margin-bottom: 60px; }
 
-        .bottom-formula {
-            font-size: 1.3rem;
-            opacity: 0.6;
-            margin-bottom: 20px;
-        }
+        /* --- 答题页样式 (五圆圈布局) --- */
+        #quiz-page { display: none; width: 100%; padding-bottom: 100px; animation: fadeIn 0.8s ease; }
+        .quiz-header { text-align: center; padding: 60px 20px 40px; }
+        .quiz-header h2 { font-size: 1.8rem; letter-spacing: 2px; }
+        .q-block { width: 88%; max-width: 500px; margin: 0 auto 30px; background: rgba(255, 255, 255, 0.6); padding: 30px 20px; border-radius: 24px; text-align: center; }
+        .q-text { font-size: 1.15rem; margin-bottom: 35px; line-height: 1.6; color: #34495e; font-weight: 600; }
+        .likert-scale { display: flex; align-items: center; justify-content: space-between; gap: 5px; }
+        .scale-label { font-size: 0.8rem; color: #95a5a6; width: 45px; }
+        .circles-group { display: flex; align-items: center; justify-content: center; gap: 15px; flex: 1; }
+        .c-label { cursor: pointer; position: relative; }
+        .c-label input { display: none; }
+        .c-dot { display: block; border: 2px solid var(--primary-color); border-radius: 50%; transition: all 0.2s ease; }
+        .size-xl { width: 34px; height: 34px; }
+        .size-m { width: 26px; height: 26px; }
+        .size-s { width: 18px; height: 18px; }
+        .c-label input:checked + .c-dot { background-color: var(--primary-color); transform: scale(1.1); }
+        .next-stage-area { text-align: center; margin-top: 50px; }
+        .next-btn { background: transparent; border: 1.5px solid var(--primary-color); padding: 18px 35px; font-size: 1.2rem; font-weight: bold; cursor: pointer; border-radius: 8px; }
 
-        .disclaimer {
-            font-size: 0.85rem;
-            color: #95a5a6;
-            font-style: italic;
-            margin-bottom: 60px; /* 页面底部的留白，确保长图质感 */
-        }
-
+        /* 通用动画 */
         .fade-in { animation: fadeIn 1.2s ease-out forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
-    <div class="top-formula fade-in">
-        $$\oint_{\partial \Sigma} \omega = \int_{\Sigma} d\omega$$
+    <div id="home-content" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
+        <div class="top-formula fade-in">
+            $$\oint_{\partial \Sigma} \omega = \int_{\Sigma} d\omega$$
+        </div>
+
+        <div class="header-section fade-in">
+            <div class="mbti-logo">
+                <svg class="mobius-svg" viewBox="0 0 100 60">
+                    <path d="M50 30 c20-20 40-10 40 10 s-20 30-40 10 c-20-20-40-10-40 10 s20 30 40 10" stroke="currentColor" fill="none" stroke-width="3"/>
+                </svg>
+                <span>MBTI</span>
+            </div>
+            <div class="mbti-sub">Math Brain Type Indicator</div>
+            <div class="author">[By Galois37]</div>
+        </div>
+
+        <div class="main-card fade-in">
+            <h1 class="title">测测你的<br>数学人格</h1>
+            <p class="subtitle">Mathematical Personality Inventory</p>
+            <div class="intro-text">
+                别对着数分高代发愁了，先来看看你是哪种“数学怪胎”。是沉迷抽象大厦的<strong>格罗滕迪克信徒</strong>，还是手算积分解方程的<strong>计算硬汉</strong>？点击下方初始化算力，在 27 道判别式中寻找你的<strong>非平凡解</strong>。
+            </div>
+            <div class="badge-group">
+                <div class="badge">🤯🥵 加权计分</div>
+                <div class="badge">🤣 仅图一乐</div>
+            </div>
+            <div class="btn-area">
+                <button class="start-btn" onclick="startTest()">
+                    <span class="btn-main">初始化算力</span>
+                    <span class="btn-sub">Initialize Heuristics</span>
+                </button>
+                <div class="bottom-formula">
+                    $$\text{Gal}(L/K) \cong G/H$$
+                </div>
+                <p class="disclaimer">* 纯属娱乐,勿对号入座</p>
+            </div>
+        </div>
     </div>
 
-    <div class="header-section fade-in">
-        <div class="mbti-logo">
-            <svg class="mobius-svg" viewBox="0 0 100 60">
-                <path d="M50 30 c20-20 40-10 40 10 s-20 30-40 10 c-20-20-40-10-40 10 s20 30 40 10" stroke="currentColor" fill="none" stroke-width="3"/>
-            </svg>
-            <span>MBTI</span>
-        </div>
-        <div class="mbti-sub">Math Brain Type Indicator</div>
-        <div class="author">[By Galois37]</div>
-    </div>
-
-    <div class="main-card fade-in">
-        <h1 class="title">测测你的<br>数学人格</h1>
-        <p class="subtitle">Mathematical Personality Inventory</p>
-
-        <div class="intro-text">
-            别对着数分高代发愁了，先来看看你是哪种“数学怪胎”。是沉迷抽象大厦的<strong>格罗滕迪克信徒</strong>，还是手算积分解方程的<strong>计算硬汉</strong>？点击下方初始化算力，在 27 道判别式中寻找你的<strong>非平凡解</strong>。
+    <div id="quiz-page">
+        <div class="quiz-header">
+            <h2>Part I: 公理体系感知</h2>
+            <p>请根据直觉选择最符合你真实想法的程度</p>
         </div>
 
-        <div class="badge-group">
-            <div class="badge">🤯🥵 加权计分</div>
-            <div class="badge">🤣 仅图一乐</div>
-        </div>
-
-        <div class="btn-area">
-            <button class="start-btn" onclick="startTest()">
-                <span class="btn-main">初始化算力</span>
-                <span class="btn-sub">Initialize Heuristics</span>
-            </button>
-
-            <div class="bottom-formula">
-                $$\text{Gal}(L/K) \cong G/H$$
+        <div id="questions-container">
+            <div class="q-block">
+                <p class="q-text">1. 待定题目：你认为数学的本质是发现而非发明吗？</p>
+                <div class="likert-scale">
+                    <span class="scale-label">不同意</span>
+                    <div class="circles-group">
+                        <label class="c-label"><input type="radio" name="q1" value="-2"><span class="c-dot size-xl"></span></label>
+                        <label class="c-label"><input type="radio" name="q1" value="-1"><span class="c-dot size-m"></span></label>
+                        <label class="c-label"><input type="radio" name="q1" value="0"><span class="c-dot size-s"></span></label>
+                        <label class="c-label"><input type="radio" name="q1" value="1"><span class="c-dot size-m"></span></label>
+                        <label class="c-label"><input type="radio" name="q1" value="2"><span class="c-dot size-xl"></span></label>
+                    </div>
+                    <span class="scale-label">同意</span>
+                </div>
+            </div>
             </div>
 
-            <p class="disclaimer">* 纯属娱乐,勿对号入座</p>
+        <div class="next-stage-area">
+            <button class="next-btn" onclick="startStageTwo()">
+                什么？还有二阶段
+            </button>
         </div>
     </div>
 
     <script>
         function startTest() {
-            console.log("算力初始化中...");
-            // 下一步：触发切换到答题界面的动画
+            // 1. 让首页内容整体淡出
+            const home = document.getElementById('home-content');
+            home.style.opacity = '0';
+            home.style.transition = '0.5s ease';
+
+            setTimeout(() => {
+                // 2. 彻底隐藏首页，显示答题页
+                home.style.display = 'none';
+                const quiz = document.getElementById('quiz-page');
+                quiz.style.display = 'block';
+                // 3. 滚动回顶部
+                window.scrollTo(0, 0);
+            }, 500);
+        }
+
+        function startStageTwo() {
+            alert("正在加载第二阶段题目...");
         }
     </script>
 </body>
