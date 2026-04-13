@@ -46,11 +46,15 @@
         /* --- 答题页样式 (五圆圈布局) --- */
         #quiz-page { display: none; width: 100%; padding-bottom: 100px; animation: fadeIn 0.8s ease; }
         .quiz-header { text-align: center; padding: 60px 20px 40px; }
-        .quiz-header h2 { font-size: 1.8rem; letter-spacing: 2px; }
+        .quiz-header h2 { font-size: 1.8rem; letter-spacing: 2px; margin-bottom: 10px; }
+        .quiz-header p { color: #7f8c8d; font-size: 0.95rem; }
         .q-block { width: 88%; max-width: 500px; margin: 0 auto 30px; background: rgba(255, 255, 255, 0.6); padding: 30px 20px; border-radius: 24px; text-align: center; }
-        .q-text { font-size: 1.15rem; margin-bottom: 35px; line-height: 1.6; color: #34495e; font-weight: 600; }
+        .q-text { font-size: 1.15rem; margin-bottom: 35px; line-height: 1.6; color: #34495e; font-weight: 600; text-align: justify; }
         .likert-scale { display: flex; align-items: center; justify-content: space-between; gap: 5px; }
-        .scale-label { font-size: 0.8rem; color: #95a5a6; width: 45px; }
+        
+        /* 微调：不同意/同意 标签样式 */
+        .scale-label { font-size: 0.9rem; color: #000; font-weight: bold; width: 55px; }
+        
         .circles-group { display: flex; align-items: center; justify-content: center; gap: 15px; flex: 1; }
         .c-label { cursor: pointer; position: relative; }
         .c-label input { display: none; }
@@ -110,25 +114,11 @@
 
     <div id="quiz-page">
         <div class="quiz-header">
-            <h2>Part I: 公理体系感知</h2>
-            <p>请根据直觉选择最符合你真实想法的程度</p>
+            <h2>局部域上的方程</h2>
+            <p>选择最符合你真实想法的程度</p>
         </div>
 
         <div id="questions-container">
-            <div class="q-block">
-                <p class="q-text">1. 待定题目：你认为数学的本质是发现而非发明吗？</p>
-                <div class="likert-scale">
-                    <span class="scale-label">不同意</span>
-                    <div class="circles-group">
-                        <label class="c-label"><input type="radio" name="q1" value="-2"><span class="c-dot size-xl"></span></label>
-                        <label class="c-label"><input type="radio" name="q1" value="-1"><span class="c-dot size-m"></span></label>
-                        <label class="c-label"><input type="radio" name="q1" value="0"><span class="c-dot size-s"></span></label>
-                        <label class="c-label"><input type="radio" name="q1" value="1"><span class="c-dot size-m"></span></label>
-                        <label class="c-label"><input type="radio" name="q1" value="2"><span class="c-dot size-xl"></span></label>
-                    </div>
-                    <span class="scale-label">同意</span>
-                </div>
-            </div>
             </div>
 
         <div class="next-stage-area">
@@ -139,18 +129,61 @@
     </div>
 
     <script>
+        const questionsData = [
+            "在接触一个新概念时，我更喜欢先看它在特殊情况下的直观图像，而非阅读严格定义。",
+            "对于一个复杂的定积分或恒等式，我更执着于寻找其背后的几何对称性或代数本质，而非直接暴力展开计算。",
+            "我学习数学的动力主要来自于纯粹的求知欲，而非它在升学和就业中的价值。",
+            "哪怕一道题做不出来，我也会因为某个定理展现出的对称美而感到由衷的喜悦。",
+            "在讨论班上，我更容易被一个精彩的比喻打动，而不是被一连串缜密的 $\\epsilon-\\delta$ 语言说服。",
+            "比起通过代数语言的证明去理解伽罗瓦理论中蕴含的结构，我更倾向于去计算具体的伽罗瓦群。",
+            "如果我知道某个科研方向更好发文章或更易就业，我会果断放弃目前感兴趣但冷门的领域。",
+            "在阅读论文时，如果我已经在直觉上把握了某个命题的“脉络”，我往往会跳过那些繁琐的验证性引理。",
+            "证明一个定理时，我一定要把它拆解到每一个逻辑节点都严丝合缝，否则我无法入睡。",
+            "我倾向于认为数学是某种“范畴论”式的结构组合，具体的计算只是这些结构的附属品。",
+            "即使没有课程的压力，我也可以整天沉浸在图书馆里乐此不疲地阅读专著或刷题。",
+            "在我看来，数学竞赛中的奇技淫巧远不如现代代数几何中的普遍框架来得迷人。",
+            "当发现某个数学解题方法可以作为考试的“秒杀大招”时，我倾向于不加证明地在考试中使用之。",
+            "我认为数学证明的“简洁”和“美感”有时比证明的“正确性”更直击本质。",
+            "如果一段数学知识被证明是“无用”的（既不能提分也不能解释现实），我反而会因为它远离尘嚣的纯粹感而产生更强的探究欲。"
+        ];
+
+        function renderQuestions() {
+            const container = document.getElementById('questions-container');
+            container.innerHTML = '';
+            questionsData.forEach((text, index) => {
+                const qNum = index + 1;
+                const html = `
+                    <div class="q-block">
+                        <p class="q-text">${qNum}. ${text}</p>
+                        <div class="likert-scale">
+                            <span class="scale-label">不同意</span>
+                            <div class="circles-group">
+                                <label class="c-label"><input type="radio" name="q${qNum}" value="-2"><span class="c-dot size-xl"></span></label>
+                                <label class="c-label"><input type="radio" name="q${qNum}" value="-1"><span class="c-dot size-m"></span></label>
+                                <label class="c-label"><input type="radio" name="q${qNum}" value="0"><span class="c-dot size-s"></span></label>
+                                <label class="c-label"><input type="radio" name="q${qNum}" value="1"><span class="c-dot size-m"></span></label>
+                                <label class="c-label"><input type="radio" name="q${qNum}" value="2"><span class="c-dot size-xl"></span></label>
+                            </div>
+                            <span class="scale-label">同意</span>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += html;
+            });
+            if (window.MathJax) MathJax.typeset();
+        }
+
+        renderQuestions();
+
         function startTest() {
-            // 1. 让首页内容整体淡出
             const home = document.getElementById('home-content');
             home.style.opacity = '0';
             home.style.transition = '0.5s ease';
 
             setTimeout(() => {
-                // 2. 彻底隐藏首页，显示答题页
                 home.style.display = 'none';
                 const quiz = document.getElementById('quiz-page');
                 quiz.style.display = 'block';
-                // 3. 滚动回顶部
                 window.scrollTo(0, 0);
             }, 500);
         }
