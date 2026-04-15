@@ -2,738 +2,627 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MBTI - 数学人格测验</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>测测你的数学人格</title>
+    
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            options: {
+                skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+            }
+        };
+    </script>
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
     <style>
         :root {
-            --bg-color: #f4f7f9;
-            --card-bg: #ffffff;
-            --text-main: #2c3e50;
-            --text-light: #7f8c8d;
-            --accent-color: #34495e;
-            --border-color: #e0e6ed;
-            --btn-hover: #2c3e50;
+            --primary-color: #2c3e50;
+            --bg-color: #eef4f9;
+            --accent-color: #3498db;
         }
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        body, html {
+            margin: 0; padding: 0;
+            width: 100%;
+            font-family: "Times New Roman", "Source Han Serif CN", serif;
             background-color: var(--bg-color);
-            color: var(--text-main);
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            min-height: 100vh;
+            color: var(--primary-color);
+            display: flex; flex-direction: column; align-items: center;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
         }
 
-        .container {
-            width: 100%;
-            max-width: 600px;
-            padding: 20px;
-            box-sizing: border-box;
-        }
+        /* --- 首页样式保持不变 --- */
+        .top-formula { margin-top: 60px; margin-bottom: 20px; font-size: 1.2rem; opacity: 0.6; }
+        .header-section { text-align: center; margin-bottom: 50px; }
+        .mbti-logo { font-size: 3rem; font-weight: 900; letter-spacing: 8px; margin: 0; display: flex; align-items: center; justify-content: center; gap: 12px; }
+        .mobius-svg { width: 50px; height: 50px; opacity: 0.9; }
+        .mbti-sub { font-size: 1rem; letter-spacing: 3px; color: #7f8c8d; margin-top: 8px; }
+        .author { font-size: 0.9rem; color: #bdc3c7; margin-top: 8px; }
+        .main-card { width: 88%; max-width: 520px; background: rgba(255, 255, 255, 0.75); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-radius: 28px; padding: 50px 30px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.04); margin-bottom: 40px; }
+        .title { font-size: 2.8rem; font-weight: 800; margin: 0 0 12px 0; letter-spacing: 4px; line-height: 1.2; }
+        .subtitle { font-size: 1.1rem; font-style: italic; color: #5d6d7e; margin-bottom: 40px; }
+        .intro-text { font-size: 1.1rem; line-height: 2; text-align: justify; margin-bottom: 45px; color: #34495e; }
+        .badge-group { display: flex; justify-content: center; gap: 15px; margin-bottom: 50px; }
+        .badge { background: rgba(238, 244, 249, 0.9); padding: 10px 18px; border-radius: 20px; font-size: 0.95rem; border: 1px solid rgba(255,255,255,0.5); }
+        .start-btn { background: transparent; border: 1.8px solid var(--primary-color); padding: 20px 0; width: 100%; max-width: 300px; cursor: pointer; transition: 0.3s; outline: none; -webkit-tap-highlight-color: transparent; margin-bottom: 40px; }
+        .btn-main { display: block; font-size: 1.5rem; font-weight: bold; letter-spacing: 2px; }
+        .btn-sub { display: block; font-size: 0.7rem; text-transform: uppercase; margin-top: 6px; }
+        .bottom-formula { font-size: 1.3rem; opacity: 0.6; margin-bottom: 20px; }
+        .disclaimer { font-size: 0.85rem; color: #95a5a6; font-style: italic; margin-bottom: 60px; }
 
-        /* 隐藏不同状态的页面 */
-        .page { display: none; }
-        .page.active { display: block; }
+        .page-container { display: none; width: 100%; padding-bottom: 100px; animation: fadeIn 0.6s ease; }
+        .quiz-header { text-align: center; padding: 60px 20px 40px; }
+        .quiz-header h2 { font-size: 1.8rem; letter-spacing: 2px; margin-bottom: 10px; }
+        .q-block { width: 88%; max-width: 500px; margin: 0 auto 30px; background: rgba(255, 255, 255, 0.6); padding: 30px 20px; border-radius: 24px; text-align: center; }
+        .q-text { font-size: 1.15rem; margin-bottom: 35px; line-height: 1.6; color: #34495e; font-weight: 600; text-align: justify; }
 
-        /* ====== 首页样式设计 (完全复刻图3) ====== */
-        .home-page {
-            text-align: center;
-            padding-top: 40px;
-        }
-        .home-equation {
-            font-size: 1.5rem;
-            color: var(--text-light);
-            margin-bottom: 20px;
-        }
-        .home-title {
-            font-size: 2.5rem;
-            font-weight: bold;
-            color: var(--accent-color);
-            margin: 10px 0 5px 0;
-            letter-spacing: 2px;
-        }
-        .home-subtitle {
-            font-size: 0.9rem;
-            color: var(--text-light);
-            letter-spacing: 1px;
-            margin-bottom: 40px;
-        }
-        .card {
-            background: var(--card-bg);
-            border-radius: 20px;
-            padding: 40px 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-            margin-bottom: 30px;
-        }
-        .card h1 {
-            font-size: 2rem;
-            margin: 0 0 10px 0;
-            color: var(--accent-color);
-        }
-        .card h3 {
-            font-style: italic;
-            color: var(--text-light);
-            font-weight: 400;
-            margin: 0 0 30px 0;
-        }
-        .card p {
-            font-size: 0.95rem;
-            line-height: 1.8;
-            color: var(--text-light);
-            text-align: justify;
-            margin-bottom: 30px;
-        }
-        .tags {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-bottom: 40px;
-        }
-        .tag {
-            background: #f0f4f8;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            color: var(--accent-color);
-            font-weight: 500;
-        }
-        .btn-init {
-            background: transparent;
-            border: 1px solid var(--accent-color);
-            color: var(--accent-color);
-            padding: 15px 40px;
-            font-size: 1.1rem;
-            font-weight: bold;
-            cursor: pointer;
-            border-radius: 5px;
-            transition: all 0.3s;
-            width: 100%;
-            max-width: 300px;
-        }
-        .btn-init:hover {
-            background: var(--accent-color);
-            color: #fff;
-        }
-        .btn-init span {
-            display: block;
-            font-size: 0.7rem;
-            font-weight: normal;
-            margin-top: 5px;
-            letter-spacing: 1px;
-        }
-        .home-footer {
-            margin-top: 30px;
-            color: var(--text-light);
-            font-size: 0.8rem;
-        }
+        .likert-scale { display: flex; align-items: center; justify-content: space-between; gap: 5px; }
+        .scale-label { font-size: 0.9rem; color: #000; font-weight: bold; width: 55px; }
+        .circles-group { display: flex; align-items: center; justify-content: center; gap: 15px; flex: 1; }
+        .c-label { cursor: pointer; position: relative; }
+        .c-label input { display: none; }
+        .c-dot { display: block; border: 2px solid var(--primary-color); border-radius: 50%; transition: all 0.2s ease; }
+        .size-xl { width: 34px; height: 34px; }
+        .size-m { width: 26px; height: 26px; }
+        .size-s { width: 18px; height: 18px; }
+        .c-label input:checked + .c-dot { background-color: var(--primary-color); transform: scale(1.1); }
 
-        /* ====== 答题页样式 ====== */
-        .quiz-header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        .progress-bar {
-            height: 6px;
-            background: var(--border-color);
-            border-radius: 3px;
-            margin-top: 20px;
-            overflow: hidden;
-        }
-        .progress-fill {
-            height: 100%;
-            background: var(--accent-color);
-            width: 0%;
-            transition: width 0.3s ease;
-        }
-        .question-card {
-            background: var(--card-bg);
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
-            margin-bottom: 20px;
-        }
-        .question-title {
-            font-size: 1.1rem;
-            line-height: 1.6;
-            margin-bottom: 25px;
-            font-weight: 600;
-        }
+        .multi-option { display: flex; align-items: flex-start; background: rgba(255,255,255,0.8); margin-bottom: 12px; padding: 18px; border-radius: 12px; text-align: left; cursor: pointer; transition: 0.2s; border: 1.5px solid transparent; min-height: 50px; height: auto; }
+        .multi-option:hover { background: #fff; }
+        .multi-option input { margin-top: 5px; margin-right: 15px; transform: scale(1.2); }
+        .multi-option span { flex: 1; line-height: 1.5; font-size: 1rem; }
+        .multi-option.selected { border-color: var(--accent-color); background: #fff; box-shadow: 0 4px 12px rgba(52, 152, 219, 0.1); }
+        .selection-hint { font-size: 1.2rem; color: #2c3e50; font-weight: 900; display: block; margin-bottom: 25px; border-bottom: 2px solid var(--primary-color); padding-bottom: 5px; }
+
+        .nav-area { display: flex; flex-direction: column; align-items: center; gap: 15px; margin-top: 40px; }
+        .btn-row { display: flex; justify-content: center; gap: 12px; width: 90%; max-width: 500px; flex-wrap: wrap; }
+        .btn-common { background: transparent; border: 1.5px solid var(--primary-color); padding: 12px 20px; font-size: 1rem; font-weight: bold; cursor: pointer; border-radius: 8px; transition: 0.3s; flex: 1; min-width: 100px; }
+        .btn-common:active { transform: scale(0.95); background: #f0f0f0; }
+        .btn-back-step { border-color: #7f8c8d; color: #7f8c8d; }
+
+        /* --- 分形动画 --- */
+        #loading-page { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: var(--bg-color); z-index: 100; flex-direction: column; justify-content: center; align-items: center; }
+        .sierpinski-loader { width: 120px; height: 105px; margin-bottom: 30px; position: relative; }
+        .sierpinski-loader svg { width: 100%; height: 100%; }
         
-        /* 5级量表样式 (Part 1) */
-        .likert-scale {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: relative;
-            margin: 20px 0;
-        }
-        .likert-scale::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 5%;
-            right: 5%;
-            height: 2px;
-            background: var(--border-color);
-            z-index: 1;
-            transform: translateY(-50%);
-        }
-        .likert-option {
-            z-index: 2;
-            background: var(--card-bg);
-            padding: 0 5px;
-            cursor: pointer;
-        }
-        .likert-option input[type="radio"] {
-            appearance: none;
-            width: 24px;
-            height: 24px;
-            border: 2px solid var(--border-color);
-            border-radius: 50%;
-            background: #fff;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .likert-option input[type="radio"]:checked {
-            border-color: var(--accent-color);
-            background: var(--accent-color);
-            box-shadow: inset 0 0 0 4px #fff;
-        }
+        .tri-main { fill: var(--primary-color); opacity: 0; animation: fadeInOut 3s infinite ease-in-out; }
+        .tri-cut { fill: var(--bg-color); opacity: 0; animation: cutIn 3s infinite ease-in-out; }
 
-        /* 不定项选项样式 (Part 2) */
-        .checkbox-option {
-            display: block;
-            margin-bottom: 15px;
-            cursor: pointer;
-        }
-        .checkbox-option input[type="checkbox"] {
-            display: none;
-        }
-        .checkbox-box {
-            display: flex;
-            padding: 15px;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            transition: all 0.2s;
-            line-height: 1.5;
-        }
-        .checkbox-option input[type="checkbox"]:checked + .checkbox-box {
-            border-color: var(--accent-color);
-            background: #f8f9fa;
-        }
+        @keyframes fadeInOut { 0%, 100% { opacity: 0; } 20%, 80% { opacity: 1; } }
+        @keyframes cutIn { 0%, 40% { opacity: 0; } 50%, 80% { opacity: 1; } 100% { opacity: 0; } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
 
-        .btn-next {
-            background: var(--accent-color);
-            color: #fff;
-            border: none;
-            padding: 15px;
-            width: 100%;
-            border-radius: 8px;
-            font-size: 1rem;
-            cursor: pointer;
-            margin-top: 20px;
-        }
-
-        /* ====== 结果页样式 (修正移动端布局) ====== */
-        .result-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 100%;
-        }
-        .result-card {
-            background: var(--card-bg);
-            width: 100%;
-            border-radius: 20px;
-            padding: 40px 20px;
-            box-sizing: border-box;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-            text-align: center;
-        }
-        .mbti-type {
-            font-size: 3rem;
-            font-weight: 900;
-            color: var(--accent-color);
-            margin: 0;
-            line-height: 1.1;
-        }
-        .mbti-name {
-            font-size: 2rem;
-            font-weight: bold;
-            color: var(--accent-color);
-            margin: 10px 0;
-        }
-        .mbti-sub {
-            font-size: 1rem;
-            color: var(--text-light);
-            margin-bottom: 30px;
-        }
-        .result-formula {
-            background: #f0f4f8;
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 30px;
-            font-size: 1.2rem;
-        }
-        .dimension-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 15px;
-            font-size: 0.9rem;
-            font-weight: bold;
-        }
-        .dimension-left { color: var(--text-light); }
-        .dimension-right { color: var(--accent-color); }
-        .result-desc {
-            text-align: justify;
-            font-size: 0.95rem;
-            line-height: 1.8;
-            color: var(--text-light);
-            margin-top: 30px;
-        }
-        .mental-state-box {
-            border: 2px dashed #e74c3c;
-            border-radius: 10px;
-            padding: 20px;
-            margin-top: 30px;
-            background: #fff9f9;
-        }
-        .mental-title {
-            color: #e74c3c;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-        
-        /* 按钮放正下方 */
-        .btn-restart {
-            background: var(--accent-color);
-            color: #fff;
-            border: none;
-            padding: 15px;
-            width: 100%;
-            border-radius: 8px;
-            font-size: 1rem;
-            cursor: pointer;
-            margin-top: 20px;
-        }
-
-        /* ====== 加载动画 ====== */
-        .loading-page {
-            text-align: center;
-            padding-top: 40vh;
-        }
-        .triangle-logo {
-            width: 0;
-            height: 0;
-            border-left: 40px solid transparent;
-            border-right: 40px solid transparent;
-            border-bottom: 69.3px solid var(--accent-color);
-            margin: 0 auto 30px auto;
-            position: relative;
-            animation: pulse 1.5s infinite;
-        }
-        .triangle-logo::after {
-            content: '';
-            position: absolute;
-            top: 23px;
-            left: -20px;
-            width: 0;
-            height: 0;
-            border-left: 20px solid transparent;
-            border-right: 20px solid transparent;
-            border-top: 34.6px solid var(--bg-color);
-        }
-        @keyframes pulse {
-            0% { transform: scale(1); opacity: 0.8; }
-            50% { transform: scale(1.05); opacity: 1; }
-            100% { transform: scale(1); opacity: 0.8; }
-        }
-
+        /* --- 新增：结果与进度条样式（严格遵循原风格） --- */
+        #calc-loading { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: var(--bg-color); z-index: 200; flex-direction: column; justify-content: center; align-items: center; }
+        .res-card { width: 88%; max-width: 550px; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); border-radius: 28px; padding: 40px 30px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.05); margin: 0 auto; }
+        .res-acronym { font-size: 3.5rem; font-weight: 900; letter-spacing: 2px; color: var(--primary-color); margin: 0; }
+        .res-title { font-size: 1.5rem; font-weight: bold; margin: 10px 0 20px; color: #34495e; }
+        .res-formula { background: rgba(255,255,255,0.6); border-radius: 12px; padding: 15px; margin: 20px 0; border: 1px dashed #bdc3c7; }
+        .res-desc { text-align: left; line-height: 1.8; font-size: 1.05rem; color: #2c3e50; margin-bottom: 30px; }
+        .mental-box { background: rgba(231, 76, 60, 0.05); border-left: 4px solid #e74c3c; padding: 15px; border-radius: 0 8px 8px 0; text-align: left; margin-top: 20px; }
+        .mental-title { font-weight: bold; color: #c0392b; margin-bottom: 8px; }
+        .chaos-egg { animation: chaosShake 0.2s infinite; background: rgba(0,0,0,0.9) !important; color: #e74c3c !important; }
+        .chaos-egg .res-title, .chaos-egg .res-desc { color: #e74c3c !important; }
+        @keyframes chaosShake { 0% { transform: translate(1px, 1px) rotate(0deg); } 25% { transform: translate(-1px, -1px) rotate(-1deg); } 50% { transform: translate(-1px, 1px) rotate(1deg); } 75% { transform: translate(1px, -1px) rotate(0deg); } 100% { transform: translate(1px, 1px) rotate(0deg); } }
     </style>
 </head>
 <body>
 
-<div class="container">
-
-    <div id="page-home" class="page active home-page">
-        <div class="home-equation">
-            \(\oint_{\partial \Sigma} \omega = \int_{\Sigma} d\omega\)
-        </div>
-        <div style="font-size: 2rem; color: var(--accent-color); margin-bottom: -5px;">\(\infty\) <span style="font-family: serif; font-weight: bold;">M B T I</span></div>
-        <div class="home-subtitle">Math Brain Type Indicator<br><span style="font-size:0.75rem">[By Galois37]</span></div>
-        
-        <div class="card">
-            <h1>测测你的<br>数学人格</h1>
-            <h3>Mathematical Personality Inventory</h3>
-            <p>别对着数分高代发愁了，先来看看你是哪种“数学怪胎”。是沉迷抽象大厦的格罗滕迪克信徒，还是手算积分方程的计算硬汉？点击下方初始化算力，在 27 道判别式中寻找你的非平凡解。</p>
-            
-            <div class="tags">
-                <div class="tag">🤯🤬 加权计分</div>
-                <div class="tag">🤣 仅图一乐</div>
+    <div id="home-content" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
+        <div class="top-formula fade-in">$$\oint_{\partial \Sigma} \omega = \int_{\Sigma} d\omega$$</div>
+        <div class="header-section fade-in">
+            <div class="mbti-logo">
+                <svg class="mobius-svg" viewBox="0 0 100 60"><path d="M50 30 c20-20 40-10 40 10 s-20 30-40 10 c-20-20-40-10-40 10 s20 30 40 10" stroke="currentColor" fill="none" stroke-width="3"/></svg>
+                <span>MBTI</span>
             </div>
-
-            <button class="btn-init" onclick="startQuiz()">
-                初始化算力
-                <span>INITIALIZE HEURISTICS</span>
-            </button>
+            <div class="mbti-sub">Math Brain Type Indicator</div>
+            <div class="author">[By Galois37]</div>
         </div>
-
-        <div class="home-footer">
-            <div>\(\text{Gal}(L/K) \cong G/H\)</div>
-            <div style="margin-top: 10px; font-style: italic;">* 纯属娱乐，勿对号入座</div>
+        <div class="main-card fade-in">
+            <h1 class="title">测测你的<br>数学人格</h1>
+            <p class="subtitle">Mathematical Personality Inventory</p>
+            <div class="intro-text">还在对数分高代发愁？好了，花点时间去玩玩有意思的数学人格测试，不要再讨论谁gpa多少了。是沉迷抽象大厦的格罗滕迪克信徒，还是手算偏微分方程的计算硬汉？点击下方初始化算力，在 28道判别式中寻找你的非平凡解。</div>
+            <div class="badge-group">
+                <div class="badge">🤯🥵 加权计分</div>
+                <div class="badge">🤣 仅图一乐</div>
+            </div>
+            <div class="btn-area">
+                <button class="start-btn" onclick="startTest()">
+                    <span class="btn-main">初始化算力</span>
+                    <span class="btn-sub">Initialize Heuristics</span>
+                </button>
+                <div class="bottom-formula">$$\text{Gal}(L/K) \cong G/H$$</div>
+                <p class="disclaimer">* 纯属娱乐,勿对号入座</p>
+            </div>
         </div>
     </div>
 
-    <div id="page-quiz" class="page">
+    <div id="loading-page">
+        <div class="sierpinski-loader">
+            <svg viewBox="0 0 100 87">
+                <polygon points="50,0 25,43.5 75,43.5" class="tri-main"/>
+                <polygon points="25,43.5 0,87 50,87" class="tri-main"/>
+                <polygon points="75,43.5 50,87 100,87" class="tri-main"/>
+                <polygon points="50,43.5 37.5,21.75 62.5,21.75" class="tri-cut"/>
+                <polygon points="25,87 12.5,65.25 37.5,65.25" class="tri-cut"/>
+                <polygon points="75,87 62.5,65.25 87.5,65.25" class="tri-cut"/>
+            </svg>
+        </div>
+        <div style="font-size: 1.2rem; font-weight: bold; letter-spacing: 2px;">方程组追加中……</div>
+    </div>
+
+    <div id="calc-loading">
+        <div style="font-size: 1.4rem; font-weight: bold; letter-spacing: 2px; color: var(--primary-color);">正在计算特征值...</div>
+        <div style="width: 80%; max-width: 300px; height: 6px; background: #ddd; border-radius: 3px; overflow: hidden; margin-top: 20px;">
+            <div id="calc-bar" style="width: 0%; height: 100%; background: var(--primary-color); transition: width 2.5s ease-in-out;"></div>
+        </div>
+    </div>
+
+    <div id="quiz-page" class="page-container">
         <div class="quiz-header">
-            <h3 style="color: var(--accent-color); margin: 0;">\(\nabla \cdot \mathbf{E} = \frac{\rho}{\varepsilon_0}\)</h3>
-            <div class="progress-bar">
-                <div class="progress-fill" id="progress"></div>
-            </div>
-            <div style="margin-top: 10px; font-size: 0.85rem; color: var(--text-light);" id="quiz-counter">1 / 27</div>
+            <h2>局部域上的方程</h2>
+            <p>选择最符合你真实想法的程度</p>
         </div>
-        
-        <div id="question-container">
+        <div id="questions-container"></div>
+        <div class="nav-area">
+            <button class="btn-common" onclick="goToStageTwoLoading()">什么？还有二阶段</button>
+        </div>
+    </div>
+
+    <div id="quiz-page-2" class="page-container">
+        <div class="quiz-header">
+            <h2>非平凡扩张：多维映射</h2>
+            <span class="selection-hint">不定项：每道题最多可以选三个选项</span>
+        </div>
+        <div id="stage2-container"></div>
+        <div class="nav-area">
+            <div class="btn-row">
+                <button class="btn-common btn-back-step" id="back-to-s1" onclick="backToStageOne()">回溯至一阶段</button>
+                <button class="btn-common" id="prev-btn" onclick="changeStage2Page(-1)">上一题</button>
+                <button class="btn-common" id="next-btn" onclick="changeStage2Page(1)">下一题</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="result-page" class="page-container" style="padding-top: 40px;">
+        <div class="res-card" id="final-card">
+            <p style="font-weight:bold; letter-spacing:3px; color:#7f8c8d; font-size:0.9rem; margin-bottom:5px;">[ SBTI 数学人格结果 ]</p>
+            <h1 class="res-acronym" id="res-code">---</h1>
+            <div class="res-title" id="res-title">---</div>
+            <div style="font-size: 0.9rem; color: #7f8c8d; font-style: italic;" id="res-expansion"></div>
+            <div class="res-formula" id="res-formula"></div>
+            
+            <div class="res-desc">
+                <strong>趣味描述：</strong><span id="desc-fun"></span><br><br>
+                <strong>数学特质：</strong><span id="desc-trait"></span>
             </div>
 
-        <button class="btn-next" onclick="nextQuestion()" id="next-btn">下一题推演</button>
+            <div class="mental-box">
+                <div class="mental-title" id="mental-tag"></div>
+                <div style="font-size:0.95rem; color:#555; line-height:1.5;" id="mental-desc"></div>
+            </div>
+
+            <button class="btn-common" style="margin-top: 40px; width: 100%; border-color: var(--primary-color);" onclick="location.reload()">重新初始化</button>
+        </div>
     </div>
 
-    <div id="page-loading" class="page loading-page">
-        <div class="triangle-logo"></div>
-        <div style="color: var(--accent-color); font-weight: bold; letter-spacing: 2px;">方程组追加中......</div>
-    </div>
+    <script>
+        // --- 核心题库与得分配置 ---
+        const stage1Questions = [
+            { text: "在接触一个新概念时，我更喜欢先看它在特殊情况下的直观图像，而非阅读严格定义。", axis: 'I', dir: 1 },
+            { text: "对于复杂的定积分或恒等式，我更执着于寻找其背后的几何或代数本质，而非暴力展开计算。", axis: 'S', dir: 1 }, // 注：代码内部映射，对应结构S
+            { text: "我学习数学的动力主要来自于纯粹的求知欲，而非它在升学和就业中的价值。", axis: 'P', dir: 1 },
+            { text: "哪怕一道题做不出来，我也会因为某个定理展现出的对称美而感到由衷的喜悦。", axis: 'P', dir: 1 },
+            { text: "在讨论班上，我更容易被一个精彩的比喻打动，而不是被一连串缜密的 $\\epsilon-\\delta$ 语言说服。", axis: 'I', dir: 1 },
+            { text: "比起通过代数语言的证明去理解伽罗瓦理论中蕴含的结构，我更倾向于去计算具体的伽罗瓦群。", axis: 'C', dir: 1 }, // 偏C计算
+            { text: "如果我知道某个科研方向更好发文章或更易就业，我会果断放弃目前感兴趣但冷门的领域。", axis: 'A', dir: 1 }, // 偏A应用/就业
+            { text: "在阅读论文时，如果我已经在直觉上把握了某个命题的“脉络”，我往往会跳过繁琐的验证性引理。", axis: 'I', dir: 1 },
+            { text: "证明定理时，我一定要把它拆解到每一个逻辑节点都严丝合缝，否则我无法入睡。", axis: 'R', dir: 1 }, // 偏R严谨
+            { text: "我倾向于认为数学是某种“范畴论”式的结构组合，具体的计算只是这些结构的附属品。", axis: 'S', dir: 1 }, // 偏S结构
+            { text: "即使没有课程的压力，我也可以整天沉浸在图书馆里乐此不疲地阅读专著或刷题。", axis: 'P', dir: 1 },
+            { text: "在我看来，数学竞赛中的奇技淫巧远不如现代代数几何中的普遍框架来得迷人。", axis: 'S', dir: 1 }, // 偏S结构
+            { text: "当发现某个解题方法可以作为“秒杀大招”时，我倾向于不加证明地在考试中使用之。", axis: 'A', dir: 1 }, // 偏A实用
+            { text: "我认为数学证明的“简洁”和“美感”有时比证明的“正确性”更直击本质。", axis: 'I', dir: 1 },
+            { text: "面对一个抽象的代数结构，我必须手动构造出几个具体的例子才能真正理解它。", axis: 'C', dir: 1 }, // 偏C构造
+            { text: "数学的尽头是无意义的符号游戏，所有的公理系统最终都会陷入不完备，追求绝对真理不过是徒劳。", axis: 'N', dir: 1 },
+            { text: "我认为数学的学习不能脱离物理实际，不能应用的数学是没有意义的。", axis: 'A', dir: 1 } // 偏A实际
+        ];
 
-    <div id="page-result" class="page">
-        <div class="result-container">
-            <div class="result-card">
-                <div style="font-weight:bold; color:#a0aab5; margin-bottom: 20px;">[分析报告]</div>
-                <h1 class="mbti-type" id="res-type">IAP</h1>
-                <h2 class="mbti-name" id="res-name">拓扑造梦师</h2>
-                <div class="mbti-sub" id="res-sub">(Intuitive-Abstract-Pure)</div>
-                
-                <div class="result-formula" id="res-formula">
-                    \(\chi(X) = \sum (-1)^i b_i\)
-                </div>
+        const stage2Questions = [
+            {
+                q: "1. 以下和数学有关的方向中,你更倾向于哪些",
+                options: [
+                    { t: "A. 基础数学研究——你知道的,我一直是基础数学爱好者啊!欣赏数学之美,为pure math 献上心脏!", s: { P: 2, S: 1 } },
+                    { t: "B. 统计或算法——别逗你纯数哥哥笑了,看看大部分学数学的最后跑哪去了。", s: { A: 2, C: 1 } },
+                    { t: "C. 金融或量化——原来你们的工资是这样的吗,在我这里可以另外一幅模样呢。视频我已经拍好了,承受能力强的话就点开来看吧~", s: { A: 2 } },
+                    { t: "D. Ai——数学已死,ai当立,岁在甲子,天下大吉!——大吉在哪?人类文明恐怕已经凶多吉少了!", s: { N: 1, A: 1 } },
+                    { t: "E. 开辅导班——学好数学就是学好数分高代,来报班国一孵蛋兜底!", s: { A: 2, R: 1 } }
+                ]
+            },
+            {
+                q: "2. 纯数学中,你喜欢什么方向",
+                options: [
+                    { t: "A. 代数几何——概型启动!数学原神牛逼!", s: { S: 2, P: 1 } },
+                    { t: "B. 偏微分方程——到底是谁说天天就只在算积分解方程的,难道不得先确定这个方程可不可解、有没有解析解吗?", s: { C: 2, R: 1 } },
+                    { t: "C. 几何分析——这是一个上等的方向!", s: { S: 1, C: 1 } },
+                    { t: "D. 朗兰兹纲领——代数几何、调和分析、表示论的交叉,我们数学也有自己的大一统理论!", s: { S: 2, P: 2 } },
+                    { t: "E. 组合数学——难度不详,和我的神秘构造说去吧", s: { C: 2 } }
+                ]
+            },
+            {
+                q: "3. 当你在图书馆为即将到来的数分高代月考而发愁时,发现旁边有位和你同级的同学正津津有味地看着《抽象代数》,你的做法是:",
+                options: [
+                    { t: "A. 把月考丢在一边,一起讨论抽象代数问题", s: { P: 1, S: 1 } },
+                    { t: "B. 抽象代数算什么,这下不得不拿出我的《同调代数》了", s: { S: 2, P: 1 } },
+                    { t: "C. 找一个合适的时机打招呼,并虚心地请教一些考试的问题", s: { R: 1, A: 1 } },
+                    { t: "D. 无所谓,又不是数分高代,到时候月考和cmc就老实了", s: { C: 1 } },
+                    { t: "E. 瞟一眼草稿纸,一秒看出上面的一个伪证然后指出来", s: { R: 2, I: 1 } }
+                ]
+            },
+            {
+                q: "4. 以下那些常数你较为喜欢",
+                options: [
+                    { t: "A. $\\pi$", s: { I: 1 } },
+                    { t: "B. 欧拉常数", s: { C: 1 } },
+                    { t: "C. 37", s: { N: 1 } },
+                    { t: "D. 索伯列夫常数 $C$", s: { R: 1 } },
+                    { t: "E. 主", s: { N: 3 } }
+                ]
+            },
+            {
+                q: "5. 当你忙碌了一天发现什么也没有忙碌,晚上躺在床上打开知乎看到自己关注的一位数学系博士的抽象发电小短文,你的反应是:",
+                options: [
+                    { t: "A. 狠狠共情,在底下评论“深度好文!不愧是数学系博士!!”", s: { N: 1, P: 1 } },
+                    { t: "B. 这种也就图一乐,在底下接龙“浅度坏理!是愧不物理系硕士!!”", s: { I: 1 } },
+                    { t: "C. 尝试从荒诞的文字中找到些许研究的灵感", s: { S: 1, P: 1 } },
+                    { t: "D. 非常担心和焦虑,仿佛看到了自己的未来", s: { N: 2 } },
+                    { t: "E. 事已至此,先睡觉吧", s: { A: 1 } }
+                ]
+            },
+            {
+                q: "6. 你比较喜欢哪些数学家的工作风格",
+                options: [
+                    { t: "A. 格罗滕迪克——用抽象重构数学宇宙<br>“当我的代数几何大厦建成之日,所有具体问题都将坍缩为平凡的特例”", s: { S: 3, P: 2 } },
+                    { t: "B. 黎曼、塞尔——几何直观与构造<br>“黎曼猜想?呵,我能看到所有的零点” ”我一个反例抵得上一百页范畴论讲义”", s: { I: 2, S: 1 } },
+                    { t: "C. 欧拉、拉马努金——注意力和算力引发的神迹<br>“女神在梦里告诉我 $2^{2^5}+1=641 \\times 6700417$”", s: { C: 3, I: 1 } },
+                    { t: "D. 丘成桐——我的几何人生 only yau!<br>“这个机会不可特意去求!”", s: { R: 1, C: 1 } },
+                    { t: "E. 希尔伯特——铁面无私的逻辑判官<br>“把数学锁进公理化的铁笼里，我们必须知道,我们必将知道”", s: { R: 3, S: 1 } }
+                ]
+            },
+            {
+                q: "7. 你对数学建模大赛的态度如何",
+                options: [
+                    { t: "A. 这不是全国大学生调包和调教ai大赛吗?数学建模一定要有数学,建议踢出数学籍!", s: { P: 2 } },
+                    { t: "B. 这才是应该办的竞赛!能培养在现实中运用数学的能力,比那什么幽默的丘赛好多了", s: { A: 2 } },
+                    { t: "C. 我准备了A、B两个选项的说辞,具体选什么取决于评论区的风向", s: { N: 1 } },
+                    { t: "D. 数学建模大赛肯定有其举办的意义,丘赛也不赖。应数不能没有纯数的理论基础,纯数也不能完全脱离实际", s: { R: 1, A: 1 } },
+                    { t: "E. 怎么同时有正反方、两面派和理中客啊!闹麻了,这问题和我这种误入数学专业只想混个毕业证的有啥关系?", s: { N: 3 } }
+                ]
+            },
+            {
+                q: "8. 如何看待《实变函数》这门课程",
+                options: [
+                    { t: "A. This is true analysis! 就喜欢这种抽象且严谨的课程,我要学一辈子实分析!", s: { R: 2, P: 1 } },
+                    { t: "B. 不喜欢这种过于抽象的,还是复变函数适合我", s: { I: 1 } },
+                    { t: "C. 管它那么多,直接数学与背诵数学启动,gpa才是王道!", s: { A: 2 } },
+                    { t: "D. 这门课在叽里咕嚕地说什么呢,这也要证?为什么老师说我几乎处处伪证啊!", s: { N: 2 } },
+                    { t: "E. 学统计的逃过一劫。不是什么叫我的概率论教材包含了实分析?", s: { A: 1 } }
+                ]
+            },
+            {
+                q: "9. 如果让你来编一部人类数学史,你会倾向于哪些风格",
+                options: [
+                    { t: "A. 编年体——以时间为线索,记录人类这场跨越千年的接力", s: { I: 1 } },
+                    { t: "B. 纪传体——聚焦于各领域的数学大师,将他们的思想投影到文字中", s: { P: 1 } },
+                    { t: "C. 形式化机器——这是一部剥离了情感的史书,没有主角,只有人类在为命题的不断演化推波助澜", s: { R: 2, S: 1 } },
+                    { t: "D. 宏大诗篇——人类的赞歌就是求知与勇气的赞歌,时代周而复始,文明坚毅不屈", s: { I: 1, P: 1 } },
+                    { t: "E. “野史” ——在未被数学舞台上的聚光灯瞥视到的角落里,隐匿着许多不为人知的秘密", s: { N: 2 } }
+                ]
+            },
+            {
+                q: "10. 人类对数学的这场远征,你想用哪个数学概念类比之",
+                options: [
+                    { t: "A. 黎曼函数的非平凡零点——除非证明之,零点不可能被算尽,正如还有无穷多的问题等待解答。", s: { C: 1, P: 1 } },
+                    { t: "B. 莫比乌斯环——当在通往真理的道路上走得足够深的时候,便发觉自己已然回到了起点", s: { S: 1, N: 1 } },
+                    { t: "C. 分形——世界在不同的尺度上都是重复且相似的,我们试图在一片雪花上找到整个宇宙的秘密。", s: { I: 2 } },
+                    { t: "D. 哥德尔不完备性定理——我们建造了最宏伟的逻辑大厦,却在基石处发现了一个致命的幽灵。远征的终点不是全知全能,而是承认理性的边界,并向那片不可言说的阴影致敬。", s: { N: 3, R: 1 } },
+                    { t: "E. 泰勒级数——我们不断叠加引理、公式与算力,一步步地逼近那不可触及的真实", s: { C: 2, A: 1 } }
+                ]
+            },
+            {
+                q: "11. 做完了本次测试,你有什么对作者想说的话",
+                options: [
+                    { t: "A. 非常好测试,使我大脑旋转", s: { I: 1 } },
+                    { t: "B. 这是一份上等的问卷!", s: { P: 1 } },
+                    { t: "C. 何意味,给我气笑了", s: { N: 1 } },
+                    { t: "D. 怀疑作者的精神状态,我得远离学数学的", s: { N: 2 } },
+                    { t: "E. 喵~", s: { N: 3 } }
+                ]
+            }
+        ];
 
-                <div class="dimension-row">
-                    <span class="dimension-left">严谨推演 (R)</span>
-                    <span class="dimension-right">直觉几何 (I)</span>
-                </div>
-                <div class="dimension-row">
-                    <span class="dimension-left">具体计算 (C)</span>
-                    <span class="dimension-right">抽象结构 (A)</span>
-                </div>
-                <div class="dimension-row">
-                    <span class="dimension-left">实际变现 (U)</span>
-                    <span class="dimension-right">纯粹真理 (P)</span>
-                </div>
+        let currentS2Index = 0;
+        let s2Storage = {};
 
-                <div class="result-desc" id="res-desc">
-                    你相信数学直觉，沉迷于最高维度的抽象结构。计算对你来说是世俗的泥沼，而结构与范畴才是宇宙的真谛。你是纯粹的理想主义者，试图用最优美的线条重构人类的认知边界。
-                </div>
+        function startTest() {
+            document.getElementById('home-content').style.display = 'none';
+            renderStage1();
+            document.getElementById('quiz-page').style.display = 'block';
+            window.scrollTo(0,0);
+        }
 
-                <div class="mental-state-box">
-                    <div class="mental-title" id="res-mental-title">精神状态评估：【薛定谔的疯】</div>
-                    <div style="font-size: 0.9rem; color: #e74c3c; text-align: justify;" id="res-mental-desc">
-                        你的理智在正常与破防之间处于一种叠加态。平时看书还能装作岁月静好，一遇到不会的证明题，波函数立刻坍缩为纯粹的绝望。建议多吃点好的。
+        function renderStage1() {
+            const container = document.getElementById('questions-container');
+            const vals = [ -2.5, -1, 0, 1, 2.5 ];
+            container.innerHTML = stage1Questions.map((q, i) => `
+                <div class="q-block">
+                    <p class="q-text">${i+1}. ${q.text}</p>
+                    <div class="likert-scale">
+                        <span class="scale-label">不同意</span>
+                        <div class="circles-group">
+                            ${vals.map((val, idx) => `
+                                <label class="c-label">
+                                    <input type="radio" name="q1_${i}" value="${val}">
+                                    <span class="c-dot ${idx === 2 ? 'size-s' : (idx === 1 || idx === 3 ? 'size-m' : 'size-xl')}"></span>
+                                </label>
+                            `).join('')}
+                        </div>
+                        <span class="scale-label">同意</span>
                     </div>
                 </div>
-            </div>
-            
-            <button class="btn-restart" onclick="location.reload()">重新初始化</button>
-        </div>
-    </div>
-
-</div>
-
-<script>
-    // 赋分结构：[I(直觉)/R(-), A(抽象)/C(-), P(纯粹)/U(-), N(混沌值)]
-    // 第一部分模拟16题 (仅为跑通流程提供基础题目支撑)
-    const part1Questions = [];
-    for(let i=0; i<16; i++) {
-        let axis = i % 3; // 0: I/R, 1: A/C, 2: P/U
-        part1Questions.push({
-            part: 1,
-            text: `(第1部分，基准测试) 当面对一个未知的数学猜想时，我通常更依赖：<br><span style="font-size:0.8rem; color:gray;">(此为后台填充的占位基准题)</span>`,
-            axis: axis, 
-            sign: (i % 2 === 0) ? 1 : -1 // 正向或反向
-        });
-    }
-
-    // 第二部分：PDF 文案 (严格按照要求修改冒号为破折号等)
-    const part2Questions = [
-        {
-            part: 2,
-            text: "1. 以下和数学有关的方向中，你更倾向于哪些",
-            options: [
-                { text: "A. 基础数学研究——你知道的，我一直是纯正的数学爱好者啊！欣赏数学之美，为pure math献上心脏！", v: [0, 1, 2, 0] },
-                { text: "B. 统计或算法——别逗你纯数姐笑了，看看大部分学数学的最后跑哪去了", v: [0, 0, -2, 1] },
-                { text: "C. 金融或量化——原来你们的工资是这样的吗，在我这里可以另外一幅模样呢，视频我已经拍好了，承受能力强的话就点开来看吧~", v: [0, 0, -2, 2] },
-                { text: "D. Ai——数学已死，ai当立，岁在甲子，天下大吉！——————大吉在哪？人类文明恐怕已经凶多吉少了！", v: [0, -1, 0, 4] },
-                { text: "E. 开辅导班——学好数学就是学好数分高代，来报班国一孵蛋兜底！", v: [-1, -1, -2, 2] }
-            ]
-        },
-        {
-            part: 2,
-            text: "2. 纯数学中，你喜欢什么方向",
-            options: [
-                { text: "A. 代数几何——概型启动！数学原神牛逼！", v: [0, 2, 1, 3] },
-                { text: "B. 偏微分方程——到底是谁说天天就只在算积分解方程的，难道不得先确定这个方程可不可解、有没有解析解吗？", v: [-1, -1, 1, 0] },
-                { text: "C. 几何分析——这是一个上等的方向！", v: [1, 0, 1, 1] },
-                { text: "D. 朗兰兹纲领——诸多领域交叉，我们数学也有自己的大一统理论！", v: [1, 2, 1, 1] },
-                { text: "E. 组合数学——难度不详，和我的神秘构造说去吧", v: [2, -1, 1, 2] }
-            ]
-        },
-        {
-            part: 2,
-            text: "3. 当你在图书馆为即将到来的数分高代月考而发愁时，发现旁边有位和你同级的同学正津津有味地看着《抽象代数》，你的做法是：",
-            options: [
-                { text: "A. 把月考丢在一边，一起讨论抽象代数问题", v: [1, 1, 1, 1] },
-                { text: "B. 抽象代数算什么，这下不得不拿出我的《同调代数》了", v: [0, 2, 1, 3] },
-                { text: "C. 找一个合适的时机打招呼，并虚心地请教一些考试的问题", v: [-1, 0, -1, 0] },
-                { text: "D. 无所谓，又不是数分高代，到时候月考和cmc就老实了", v: [0, -1, -1, 1] },
-                { text: "E. 瞟一眼草稿纸，一秒看出上面的一个伪证然后指出来", v: [2, 0, 0, 2] }
-            ]
-        },
-        {
-            part: 2,
-            text: "4. 以下那些常数你较为喜欢",
-            options: [
-                { text: "A. pi", v: [0, -1, 0, 0] },
-                { text: "B. 欧拉常数", v: [-1, 0, 0, 0] },
-                { text: "C. 37", v: [0, 0, 0, 3] },
-                { text: "D. 索伯列夫常数C", v: [-1, 1, 0, 1] },
-                { text: "E. 主", v: [1, 1, 1, 4] }
-            ]
-        },
-        {
-            part: 2,
-            text: "5. 当你忙碌了一天发现什么也没有忙碌，晚上躺在床上打开知乎看到自己关注的一位数学系博士的抽象发电小短文，你的反应是：",
-            options: [
-                { text: "A. 狠狠共情，在底下评论“深度好文！不愧是数学系博士！！”", v: [0, 0, 0, 2] },
-                { text: "B. 这种也就图一乐，在底下接龙“浅度坏理！是愧不物理系硕士！！”", v: [0, 0, 0, 3] },
-                { text: "C. 尝试从荒诞的文字中找到些许研究的灵感", v: [1, 1, 1, 1] },
-                { text: "D. 非常担心和焦虑，仿佛看到了自己的未来", v: [0, 0, 0, 2] },
-                { text: "E. 事已至此，先睡觉吧", v: [0, 0, 0, 0] }
-            ]
-        },
-        {
-            part: 2,
-            text: "6. 你比较喜欢哪些数学家的工作风格",
-            options: [
-                { text: "A. 格罗滕迪克——用抽象重构数学宇宙<br>“当我的代数几何大厦建成之日，所有具体问题都将坍缩为平凡的特例”", v: [1, 2, 1, 1] },
-                { text: "B. 黎曼、塞尔——几何直观与构造例子之力<br>“黎曼猜想？呵，我能看到所有的零点” “我一个反例抵得上一百页范畴论讲义”", v: [2, -1, 1, 0] },
-                { text: "C. 欧拉、拉马努金——注意力和算力引发的神迹<br>“女神在梦里告诉我2^2^5+1=641*6700417”", v: [2, -2, 1, 2] },
-                { text: "D. 丘成桐——我的几何人生 only yau！<br>“这个机会不可特意去求！”", v: [-1, 0, -1, 1] },
-                { text: "E. 希尔伯特——铁面无私的逻辑判官<br>“把数学锁进公理化的铁笼里” “我们必须知道，我们必将知道”", v: [-2, 1, 1, 0] }
-            ]
-        },
-        {
-            part: 2,
-            text: "7. 你对数学建模大赛的态度如何",
-            options: [
-                { text: "A. 这不是全国大学生调包和调教ai大赛吗？数学建模一定要有数学，建议踢出数学籍！", v: [0, 1, 2, 2] },
-                { text: "B. 这才是应该办的竞赛！能培养在现实中运用数学的能力，比那什么幽默的丘赛好多了", v: [0, -1, -2, 1] },
-                { text: "C. 我准备了A、B两个选项的说辞，具体选什么取决于评论区的风向", v: [0, 0, 0, 3] },
-                { text: "D. 数学建模大赛肯定有其举办的意义，丘赛也不赖。应数不能没有纯数的理论基础，纯数也不能完全脱离实际", v: [0, 0, 0, 0] },
-                { text: "E. 怎么同时有正反方、两面派和理中客啊！闹麻了，这问题和我这种误入数学专业只想混个毕业证的有啥关系？", v: [0, 0, -2, 2] }
-            ]
-        },
-        {
-            part: 2,
-            text: "8. 如何看待《实变函数》这门课程",
-            options: [
-                { text: "A. This is true analysis! 就喜欢这种抽象且严谨的课程，我要学一辈子实分析！", v: [-2, 1, 1, 1] },
-                { text: "B. 不喜欢这种过于抽象的，还是复变函数适合我", v: [1, -1, 0, 0] },
-                { text: "C. 管它那么多，直接数学与背诵数学启动，gpa才是王道！", v: [0, -1, -2, 1] },
-                { text: "D. 这门课在叽里咕噜地说什么呢，这也要证？为什么老师说我几乎处处伪证啊！", v: [1, 0, 0, 2] },
-                { text: "E. 学统计的逃过一劫。不是什么叫我的概率论教材包含了实分析？", v: [0, -1, -1, 1] }
-            ]
-        },
-        {
-            part: 2,
-            text: "9. 如果让你来编一部人类数学史，你会倾向于哪些风格",
-            options: [
-                { text: "A. 编年体——以时间为线索，记录人类这场跨越千年的接力", v: [-1, 0, 0, 0] },
-                { text: "B. 纪传体——聚焦于各领域的数学大师，将他们的思想投影到文字中", v: [1, 0, 0, 0] },
-                { text: "C. 形式化机器——这是一部剥离了情感的史书，没有主角，只有人类在为命题的不断演化推波助澜", v: [-1, 2, 1, 2] },
-                { text: "D. 宏大诗篇——人类的赞歌就是求知与勇气的赞歌，时代周而复始，文明坚毅不屈", v: [1, 1, 1, 1] },
-                { text: "E. “野史”——在未被数学舞台上的聚光灯瞥视到的角落里，隐匿着许多不为人知的秘密", v: [2, 0, 0, 2] }
-            ]
-        },
-        {
-            part: 2,
-            text: "10. 人类对数学的这场远征，你想用哪个数学概念类比之",
-            options: [
-                { text: "A. 黎曼函数的非平凡零点——除非证明之，零点不可能被算尽，正如还有无穷多的问题等待解答。", v: [1, 0, 1, 1] },
-                { text: "B. 莫比乌斯环——当在通往真理的道路上走得足够深的时候，便发觉自己已然回到了起点", v: [1, 1, 1, 2] },
-                { text: "C. 分形——世界在不同的尺度上都是重复且相似的，我们试图在一片雪花上找到整个宇宙的秘密。", v: [2, -1, 1, 1] },
-                { text: "D. 哥德尔不完备性定理——我们建造了最宏伟的逻辑大厦，却在基石处发现了一个致命的幽灵。远征的终点不是全知全能，而是承认理性的边界，并向那片不可言说的阴影致敬。", v: [-1, 2, 1, 3] },
-                { text: "E. 泰勒级数——我们不断叠加引理、公式与算力，一步步地逼近那不可触及的真实", v: [-2, -1, 1, 0] }
-            ]
-        },
-        {
-            part: 2,
-            text: "11. 做完了本次测试，你有什么对作者想说的话",
-            options: [
-                { text: "A. 非常好测试，使我大脑旋转", v: [0, 0, 0, 2] },
-                { text: "B. 这是一份上等的问卷！", v: [0, 0, 0, 1] },
-                { text: "C. 何意味，给我气笑了", v: [0, 0, 0, 3] },
-                { text: "D. 怀疑作者的精神状态，我得远离学数学的", v: [0, 0, 0, 2] },
-                { text: "E. 喵", v: [0, 0, 0, 5] }
-            ]
+            `).join('');
+            if(window.MathJax) MathJax.typeset();
         }
-    ];
 
-    const allQuestions = [...part1Questions, ...part2Questions];
-    let currentIndex = 0;
-    let scores = { I: 0, A: 0, P: 0, N: 0 };
-    let userAnswers = {};
-
-    function startQuiz() {
-        document.getElementById('page-home').classList.remove('active');
-        document.getElementById('page-quiz').classList.add('active');
-        renderQuestion();
-    }
-
-    function renderQuestion() {
-        const q = allQuestions[currentIndex];
-        const container = document.getElementById('question-container');
-        document.getElementById('quiz-counter').innerText = `${currentIndex + 1} / ${allQuestions.length}`;
-        document.getElementById('progress').style.width = `${((currentIndex) / allQuestions.length) * 100}%`;
-
-        let html = `<div class="question-title">${q.text}</div>`;
-
-        if (q.part === 1) {
-            html += `<div style="display:flex; justify-content:space-between; color:var(--text-light); font-size:0.8rem;">
-                        <span>极不认同</span><span>极其认同</span>
-                     </div>
-                     <div class="likert-scale">`;
-            const weights = q.sign > 0 ? [-2.5, -1, 0, 1, 2.5] : [2.5, 1, 0, -1, -2.5];
-            weights.forEach((w, idx) => {
-                html += `
-                <label class="likert-option">
-                    <input type="radio" name="q${currentIndex}" value="${w}">
-                </label>`;
-            });
-            html += `</div>`;
-        } else {
-            // 第二部分：不定项选择（Checkbox）
-            q.options.forEach((opt, idx) => {
-                html += `
-                <label class="checkbox-option">
-                    <input type="checkbox" name="q${currentIndex}" value="${idx}">
-                    <div class="checkbox-box">${opt.text}</div>
-                </label>`;
-            });
-        }
-        
-        container.innerHTML = html;
-        
-        if (currentIndex === allQuestions.length - 1) {
-            document.getElementById('next-btn').innerText = "提交解析";
-        }
-    }
-
-    function nextQuestion() {
-        const q = allQuestions[currentIndex];
-        
-        if (q.part === 1) {
-            const selected = document.querySelector(`input[name="q${currentIndex}"]:checked`);
-            if (selected) {
-                let w = parseFloat(selected.value);
-                if (q.axis === 0) scores.I += w;
-                else if (q.axis === 1) scores.A += w;
-                else if (q.axis === 2) scores.P += w;
+        // --- 逻辑校验：进入第二阶段 ---
+        function goToStageTwoLoading() {
+            // 校验第一阶段是否全答完
+            for(let i=0; i<stage1Questions.length; i++) {
+                if(!document.querySelector(`input[name="q1_${i}"]:checked`)) {
+                    alert("还有题目没做完喵~");
+                    return;
+                }
             }
-        } else {
-            const selected = document.querySelectorAll(`input[name="q${currentIndex}"]:checked`);
-            selected.forEach(node => {
-                let opt = q.options[parseInt(node.value)];
-                scores.I += opt.v[0];
-                scores.A += opt.v[1];
-                scores.P += opt.v[2];
-                scores.N += opt.v[3];
-            });
+
+            document.getElementById('quiz-page').style.display = 'none';
+            document.getElementById('loading-page').style.display = 'flex';
+            setTimeout(() => {
+                document.getElementById('loading-page').style.display = 'none';
+                document.getElementById('quiz-page-2').style.display = 'block';
+                renderStage2Page();
+            }, 3000);
         }
 
-        if (currentIndex < allQuestions.length - 1) {
-            currentIndex++;
-            renderQuestion();
-        } else {
-            showLoading();
-        }
-    }
+        function renderStage2Page() {
+            const container = document.getElementById('stage2-container');
+            const data = stage2Questions[currentS2Index];
+            const saved = s2Storage[currentS2Index] || [];
 
-    function showLoading() {
-        document.getElementById('page-quiz').classList.remove('active');
-        document.getElementById('page-loading').classList.add('active');
-        
-        setTimeout(() => {
-            calculateAndShowResult();
-        }, 2000);
-    }
+            container.innerHTML = `
+                <div class="q-block" style="animation: fadeIn 0.4s ease;">
+                    <p class="q-text">${data.q}</p>
+                    <div id="options-box">
+                        ${data.options.map((opt, i) => `
+                            <label class="multi-option ${saved.includes(i) ? 'selected' : ''}" id="opt-label-${i}">
+                                <input type="checkbox" name="q2_${currentS2Index}" value="${i}" 
+                                       ${saved.includes(i) ? 'checked' : ''} 
+                                       onchange="handleLimit(this, ${i})">
+                                <span>${opt.t}</span>
+                            </label>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
 
-    function calculateAndShowResult() {
-        document.getElementById('page-loading').classList.remove('active');
-        document.getElementById('page-result').classList.add('active');
-
-        // 应用阈值平移
-        let isI = scores.I > 1.5;
-        let isA = scores.A > 2.0; 
-        let isP = scores.P > 0;
-
-        let typeStr = (isI ? "I" : "R") + (isA ? "A" : "C") + (isP ? "P" : "U");
-        
-        const mbtiDict = {
-            "IAP": { name: "拓扑造梦师", sub:"(Intuitive-Abstract-Pure)", desc: "你相信数学直觉，沉迷于最高维度的抽象结构。计算对你来说是世俗的泥沼，而结构与范畴才是宇宙的真谛。", form: "\\(\\chi(X) = \\sum (-1)^i b_i\\)"},
-            "RAP": { name: "严谨建筑师", sub:"(Rigor-Abstract-Pure)", desc: "你是公理体系的守护者。你热衷于抽象概念，但绝不容忍直觉的跳跃，每一步推导都必须无懈可击。", form: "\\(ZFC \\vdash \\text{Theorem}\\)"},
-            "ICP": { name: "直觉解题家", sub:"(Intuitive-Concrete-Pure)", desc: "你有着敏锐的数字和图形嗅觉。面对具体问题，你总能天马行空地找到巧妙的构造和特解。", form: "\\(e^{i\\pi} + 1 = 0\\)"},
-            "RCP": { name: "计算硬汉", sub:"(Rigor-Concrete-Pure)", desc: "真正的分析硬汉。不惧怕繁琐的硬核计算与放缩，坚信再复杂的积分也能通过扎实的计算被征服。", form: "\\(\\int_{-\\infty}^{\\infty} e^{-x^2} dx = \\sqrt{\\pi}\\)"},
-            "IAU": { name: "算法先知", sub:"(Intuitive-Abstract-Utility)", desc: "你善于捕捉高维抽象框架在现实中的投影。对你而言，数学是降维打击的终极武器，能迅速洞察复杂系统的本质。", form: "\\(O(N \\log N)\\)"},
-            "RAU": { name: "量化模型师", sub:"(Rigor-Abstract-Utility)", desc: "你将严谨的数学结构应用到现实模型中。每一套算法和金融模型背后，都经过了你严密的数学论证。", form: "\\(dS_t = \\mu S_t dt + \\sigma S_t dW_t\\)"},
-            "ICU": { name: "实用构造者", sub:"(Intuitive-Concrete-Utility)", desc: "你灵活务实，讨厌枯燥的理论证明。你总能用最直观的方法拼凑出解决实际问题的有效工具。", form: "\\(F=ma\\)"},
-            "RCU": { name: "统计工程师", sub:"(Rigor-Concrete-Utility)", desc: "脚踏实地的现实主义者。你用最严谨的态度对待每一份具体数据，相信统计与算法才能改变世界。", form: "\\(y = \\beta_0 + \\beta_1 x + \\epsilon\\)"}
-        };
-
-        const res = mbtiDict[typeStr];
-        document.getElementById('res-type').innerText = typeStr;
-        document.getElementById('res-name').innerText = res.name;
-        document.getElementById('res-sub').innerText = res.sub;
-        document.getElementById('res-desc').innerText = res.desc;
-        document.getElementById('res-formula').innerHTML = res.form;
-
-        // 精神状态分级判定 (新的极高阈值)
-        let mentalTitle = "";
-        let mentalDesc = "";
-        if (scores.N < 5) {
-            mentalTitle = "精神状态评估：【清澈愚蠢】";
-            mentalDesc = "你对数学依然抱有朴素的希望和热情。精神状态极其稳定，尚未遭到现代数学体系的毒打。";
-        } else if (scores.N < 12) {
-            mentalTitle = "精神状态评估：【薛定谔的疯】";
-            mentalDesc = "你的理智在正常与破防之间处于一种叠加态。平时看书还能装作岁月静好，一遇到不会的证明题，波函数立刻坍缩为纯粹的绝望。建议多吃点好的。";
-        } else if (scores.N < 20) {
-            mentalTitle = "精神状态评估：【抽象入脑】";
-            mentalDesc = "你已经逐渐脱离人类正常交流逻辑。看世界的眼光已被同态与同调解构，旁人很难听懂你在说什么。";
-        } else {
-            mentalTitle = "精神状态评估：【精神混沌】";
-            mentalDesc = "喵喵喵喵喵？数学是什么？公理系统不过是一场虚无的符号游戏！你的思想已然狂化，随时准备转行或者羽化登仙。";
+            document.getElementById('prev-btn').style.display = currentS2Index === 0 ? 'none' : 'block';
+            document.getElementById('back-to-s1').style.display = currentS2Index === 0 ? 'block' : 'none';
+            
+            const nextBtn = document.getElementById('next-btn');
+            if (currentS2Index === stage2Questions.length - 1) {
+                nextBtn.innerText = '提交结果';
+                nextBtn.onclick = submitTest;
+            } else {
+                nextBtn.innerText = '下一题';
+                nextBtn.onclick = () => changeStage2Page(1);
+            }
+            
+            if(window.MathJax) MathJax.typesetPromise();
+            window.scrollTo(0,0);
         }
 
-        document.getElementById('res-mental-title').innerText = mentalTitle;
-        document.getElementById('res-mental-desc').innerText = mentalDesc;
-
-        // 重新渲染新生成的 MathJax 公式
-        if (window.MathJax) {
-            MathJax.typesetPromise();
+        function handleLimit(checkbox, optIndex) {
+            const checkedBoxes = document.querySelectorAll(`input[name="q2_${currentS2Index}"]:checked`);
+            const label = document.getElementById(`opt-label-${optIndex}`);
+            
+            if (checkedBoxes.length > 3) {
+                checkbox.checked = false;
+                alert("最多只能选三项喵~");
+            } else {
+                label.classList.toggle('selected', checkbox.checked);
+                const selected = Array.from(checkedBoxes).map(cb => parseInt(cb.value));
+                s2Storage[currentS2Index] = selected;
+            }
         }
-    }
-</script>
 
+        // --- 逻辑校验：阶段二切换 ---
+        function changeStage2Page(step) {
+            if (step === 1) {
+                if(!s2Storage[currentS2Index] || s2Storage[currentS2Index].length === 0) {
+                    alert("还有题目没做完喵~");
+                    return;
+                }
+            }
+            currentS2Index += step;
+            renderStage2Page();
+        }
+
+        function backToStageOne() {
+            document.getElementById('quiz-page-2').style.display = 'none';
+            document.getElementById('quiz-page').style.display = 'block';
+            window.scrollTo(0,0);
+        }
+
+        // --- 提交并计算器动画 ---
+        function submitTest() {
+            if(!s2Storage[currentS2Index] || s2Storage[currentS2Index].length === 0) {
+                alert("还有题目没做完喵~");
+                return;
+            }
+
+            document.getElementById('quiz-page-2').style.display = 'none';
+            const loadPage = document.getElementById('calc-loading');
+            loadPage.style.display = 'flex';
+            
+            // 进度条动画
+            setTimeout(() => { document.getElementById('calc-bar').style.width = '100%'; }, 100);
+
+            setTimeout(() => {
+                loadPage.style.display = 'none';
+                calculateAndShowResult();
+            }, 2600);
+        }
+
+        // --- 核心赋分逻辑 ---
+        function calculateAndShowResult() {
+            let total = { I: 0, R: 0, S: 0, C: 0, P: 0, A: 0, N: 0 };
+
+            // 1. 一阶段积分
+            for (let i = 0; i < stage1Questions.length; i++) {
+                let val = parseFloat(document.querySelector(`input[name="q1_${i}"]:checked`).value);
+                let q = stage1Questions[i];
+                let actualVal = val * q.dir;
+                if (actualVal > 0) {
+                    total[q.axis] += actualVal;
+                } else if (actualVal < 0) {
+                    // 扣分代表投给对立轴
+                    let opp = '';
+                    if(q.axis === 'I') opp = 'R';
+                    if(q.axis === 'S') opp = 'C';
+                    if(q.axis === 'P') opp = 'A';
+                    if(q.axis === 'N') continue; // N没有严格对立面
+                    total[opp] += Math.abs(actualVal);
+                }
+            }
+
+            // 2. 二阶段积分
+            for (let i = 0; i < stage2Questions.length; i++) {
+                let selected = s2Storage[i] || [];
+                selected.forEach(optIdx => {
+                    let sMap = stage2Questions[i].options[optIdx].s;
+                    for (let key in sMap) {
+                        total[key] += sMap[key];
+                    }
+                });
+            }
+
+            // 3. 维度判定
+            // 为了让分布更均匀，加入阈值平衡偏移(Threshold Offset)
+            // 原始倾向中，I, S, P 往往偏高。
+            let diff_IR = total.I - total.R; 
+            let diff_SC = total.S - total.C; 
+            let diff_PA = total.P - total.A; 
+            
+            let res_D1 = diff_IR > 1 ? 'I' : 'R';
+            let res_D2 = diff_SC > 0 ? 'S' : 'C';
+            let res_D3 = diff_PA > 0 ? 'P' : 'A';
+            
+            let code = res_D1 + res_D2 + res_D3;
+            let nScore = total.N;
+
+            // 4. 文案库 (完全采用你提供的 SBTI 风格库)
+            const resLib = {
+                "ISP": { 
+                    c: "I-S (理想空间)", e: "Ideal Space Projection (理想空间投影)", f: "$$\\mathcal{F}: \\text{Sch} \\to \\text{Sets}$$",
+                    fun: "想法太超前/抽象，以至于除了你自己，没有人能看懂你在草稿纸上画的是概型还是某种克苏鲁符咒。", 
+                    trait: "沉迷于连上帝都要翻说明书的范畴论大厦，觉得具体的数值计算是对智力的某种亵渎。" 
+                },
+                "RSP": { 
+                    c: "QED (证明终结者)", e: "Quod Erat Demonstrandum (这就是所要证明的)", f: "$$\\forall \\epsilon > 0, \\exists \\delta > 0$$",
+                    fun: "极度严谨。当你和他人说话时，你会不断指出对方语言中的逻辑漏洞，甚至在梦里都在补引理。", 
+                    trait: "你的字典里没有“显而易见”，每一个 $\\epsilon$ 都必须找到属于它的 $\\delta$。" 
+                },
+                "ICP": { 
+                    c: "NP-H (硬核难题)", e: "Non-deterministic Polynomial Hard (非确定性多项式难题)", f: "$$L(s, \\chi) = \\sum_{n=1}^\\infty \\frac{\\chi(n)}{n^s}$$",
+                    fun: "这种人的性格极其复杂且不可逾越，通常出没于解析数论研讨班的最后一排。", 
+                    trait: "你的笔尖自带算法加速，能在一片混乱中直接抠出本质的解析结构，解题风格堪比拉马努金。" 
+                },
+                "RCP": { 
+                    c: "L-L (勒贝格领主)", e: "Lebesgue Linear Precision (勒贝格线性精度)", f: "$$\\int_E f \\, d\\mu$$",
+                    fun: "每天都在试图把你这辈子见到的所有东西都测度化，即使是去食堂点菜，也要试图建立菜品与餐标之间的可测函数。", 
+                    trait: "纯数界的全能战士，既有深厚的算力底蕴，又执着于严丝合缝的逻辑推导。" 
+                },
+                "ISA": { 
+                    c: "Chaos (混沌系统)", e: "Complex Holistic Applied Order System (复杂的整体应用秩序系统)", f: "$$x_{n+1} = rx_n(1-x_n)$$",
+                    fun: "你的大脑里装满了流形和吸引子。你总能从物理世界的混乱中看出一丝几何的端倪。", 
+                    trait: "擅长定性分析，认为世界是一场宏大的拓扑变换，一切应用最终都应归结为优雅的数学结构。" 
+                },
+                "RSA": { 
+                    c: "Orbit (轨道守卫者)", e: "Optimized Rational Boundary Invariant Theory (优化的理性边界不变性理论)", f: "$$\\frac{d\\mathbf{x}}{dt} = \\mathbf{f}(\\mathbf{x}, t)$$",
+                    fun: "致力于为现实世界建立绝对可靠的逻辑模型。你不仅能写出能跑通的代码，还能给出该模型在极端情况下也不会崩塌的证明。", 
+                    trait: "在结构化思维和严密逻辑之间找到了完美的平衡点，是复杂工程背后的逻辑守护神。" 
+                },
+                "ICA": { 
+                    c: "Solver (暴力计算器)", e: "Simplified Operational Linear Validator Engine Runner (简化的运算线性验证引擎)", f: "$$\\int_{-\\infty}^{\\infty} e^{-x^2} dx = \\sqrt{\\pi}$$",
+                    fun: "“只要算得够快，理论上的瑕疵就追不上我”。对你来说，好用的数学工具比完美的逻辑链条更迷人。", 
+                    trait: "具有极强的实践导向，深信数学的生命力在于它能算得出结果。" 
+                },
+                "RCA": { 
+                    c: "$\\epsilon$-0 (极限趋近零)", e: "Error-free Precision Scale (零误差精度标尺)", f: "$$\\min \\|Ax - b\\|_2$$",
+                    fun: "绩点很高但有时会被吐槽为“数学机器”。你极其擅长数值分析，过程规范得像教科书。", 
+                    trait: "追求应用中的绝对精度与效率。在你的世界里，每一位有效数字都有它的尊严。" 
+                }
+            };
+
+            let finalData = resLib[code];
+
+            // 5. N值判定 (3个程度) -> 调整阈值使最后一级稀有
+            let nTag = "", nDesc = "";
+            let isChaos = false;
+
+            if (nScore < 8) {
+                nTag = "精神状态等级 1：守序凡人";
+                nDesc = "你的精神状态极其稳定，未被过度侵蚀。逻辑自洽，适合继续脚踏实地地推算公式。";
+            } else if (nScore < 15) {
+                nTag = "精神状态等级 2：$\\emptyset$ (空集观察者)";
+                nDesc = "<strong>代码扩写： Non-existent Null Nexus (不存在的零点纽带)</strong><br><br>恭喜（或遗憾），你看穿了数学作为符号游戏的本质。虽然你还在继续“非平凡解”的追寻，但你深知这一切最终都会消解在哥德尔的幽灵里。";
+            } else {
+                // 第三级别：极端思想混沌/疯癫
+                if (code === "ISP") {
+                    // 彩蛋：ISP + N3
+                    nTag = "⚠️ 精神状态特异点：格罗滕迪克彩蛋触发";
+                    nDesc = "你的精神状态已经到了非常混沌、颠覆的极限程度。你不再是为了解题而学习，你试图用另一种维度的语言去重新定义现实。你是逻辑虚无中那个唯一的立法者。";
+                    isChaos = true;
+                } else {
+                    nTag = "精神状态等级 3：混沌的极点 (思想疯癫)";
+                    nDesc = "你的精神状态呈现出一种难以名状的混沌。对于你来说，推导过程更像是一场精神呓语。世界是混乱的，你那被数学重构的大脑也是。你正处在彻底疯癫的边缘。";
+                }
+            }
+
+            // 渲染结果
+            document.getElementById('res-code').innerText = finalData.c;
+            document.getElementById('res-title').innerText = `[${code}] 人格映射`;
+            document.getElementById('res-expansion').innerText = finalData.e;
+            document.getElementById('res-formula').innerHTML = finalData.f;
+            document.getElementById('desc-fun').innerText = finalData.fun;
+            document.getElementById('desc-trait').innerText = finalData.trait;
+            
+            document.getElementById('mental-tag').innerText = nTag;
+            document.getElementById('mental-desc').innerHTML = nDesc;
+
+            if (isChaos) {
+                document.getElementById('final-card').classList.add('chaos-egg');
+            }
+
+            document.getElementById('result-page').style.display = 'block';
+            if(window.MathJax) MathJax.typesetPromise();
+            window.scrollTo(0,0);
+        }
+    </script>
 </body>
 </html>
