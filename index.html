@@ -98,7 +98,7 @@
         @keyframes cutIn { 0%, 40% { opacity: 0; } 50%, 80% { opacity: 1; } 100% { opacity: 0; } }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* --- 新增：结果与进度条样式（严格遵循原风格） --- */
+        /* --- 结果与进度条样式（严格遵循原风格） --- */
         #calc-loading { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: var(--bg-color); z-index: 200; flex-direction: column; justify-content: center; align-items: center; }
         .res-card { width: 88%; max-width: 550px; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); border-radius: 28px; padding: 40px 30px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.05); margin: 0 auto; }
         .res-acronym { font-size: 3.5rem; font-weight: 900; letter-spacing: 2px; color: var(--primary-color); margin: 0; }
@@ -192,15 +192,12 @@
 
     <div id="result-page" class="page-container" style="padding-top: 40px;">
         <div class="res-card" id="final-card">
-            <p style="font-weight:bold; letter-spacing:3px; color:#7f8c8d; font-size:0.9rem; margin-bottom:5px;">[ SBTI 数学人格结果 ]</p>
+            <p style="font-weight:bold; letter-spacing:3px; color:#7f8c8d; font-size:0.9rem; margin-bottom:5px;">[ 特征值分析结果 ]</p>
             <h1 class="res-acronym" id="res-code">---</h1>
-            <div class="res-title" id="res-title">---</div>
-            <div style="font-size: 0.9rem; color: #7f8c8d; font-style: italic;" id="res-expansion"></div>
+            <div style="font-size: 0.9rem; color: #7f8c8d; font-style: italic; margin-top: 10px;" id="res-expansion"></div>
             <div class="res-formula" id="res-formula"></div>
             
-            <div class="res-desc">
-                <strong>趣味描述：</strong><span id="desc-fun"></span><br><br>
-                <strong>数学特质：</strong><span id="desc-trait"></span>
+            <div class="res-desc" id="res-desc-combined">
             </div>
 
             <div class="mental-box">
@@ -216,22 +213,22 @@
         // --- 核心题库与得分配置 ---
         const stage1Questions = [
             { text: "在接触一个新概念时，我更喜欢先看它在特殊情况下的直观图像，而非阅读严格定义。", axis: 'I', dir: 1 },
-            { text: "对于复杂的定积分或恒等式，我更执着于寻找其背后的几何或代数本质，而非暴力展开计算。", axis: 'S', dir: 1 }, // 注：代码内部映射，对应结构S
+            { text: "对于复杂的定积分或恒等式，我更执着于寻找其背后的几何或代数本质，而非暴力展开计算。", axis: 'S', dir: 1 },
             { text: "我学习数学的动力主要来自于纯粹的求知欲，而非它在升学和就业中的价值。", axis: 'P', dir: 1 },
             { text: "哪怕一道题做不出来，我也会因为某个定理展现出的对称美而感到由衷的喜悦。", axis: 'P', dir: 1 },
             { text: "在讨论班上，我更容易被一个精彩的比喻打动，而不是被一连串缜密的 $\\epsilon-\\delta$ 语言说服。", axis: 'I', dir: 1 },
-            { text: "比起通过代数语言的证明去理解伽罗瓦理论中蕴含的结构，我更倾向于去计算具体的伽罗瓦群。", axis: 'C', dir: 1 }, // 偏C计算
-            { text: "如果我知道某个科研方向更好发文章或更易就业，我会果断放弃目前感兴趣但冷门的领域。", axis: 'A', dir: 1 }, // 偏A应用/就业
+            { text: "比起通过代数语言的证明去理解伽罗瓦理论中蕴含的结构，我更倾向于去计算具体的伽罗瓦群。", axis: 'C', dir: 1 },
+            { text: "如果我知道某个科研方向更好发文章或更易就业，我会果断放弃目前感兴趣但冷门的领域。", axis: 'A', dir: 1 },
             { text: "在阅读论文时，如果我已经在直觉上把握了某个命题的“脉络”，我往往会跳过繁琐的验证性引理。", axis: 'I', dir: 1 },
-            { text: "证明定理时，我一定要把它拆解到每一个逻辑节点都严丝合缝，否则我无法入睡。", axis: 'R', dir: 1 }, // 偏R严谨
-            { text: "我倾向于认为数学是某种“范畴论”式的结构组合，具体的计算只是这些结构的附属品。", axis: 'S', dir: 1 }, // 偏S结构
+            { text: "证明定理时，我一定要把它拆解到每一个逻辑节点都严丝合缝，否则我无法入睡。", axis: 'R', dir: 1 },
+            { text: "我倾向于认为数学是某种“范畴论”式的结构组合，具体的计算只是这些结构的附属品。", axis: 'S', dir: 1 },
             { text: "即使没有课程的压力，我也可以整天沉浸在图书馆里乐此不疲地阅读专著或刷题。", axis: 'P', dir: 1 },
-            { text: "在我看来，数学竞赛中的奇技淫巧远不如现代代数几何中的普遍框架来得迷人。", axis: 'S', dir: 1 }, // 偏S结构
-            { text: "当发现某个解题方法可以作为“秒杀大招”时，我倾向于不加证明地在考试中使用之。", axis: 'A', dir: 1 }, // 偏A实用
+            { text: "在我看来，数学竞赛中的奇技淫巧远不如现代代数几何中的普遍框架来得迷人。", axis: 'S', dir: 1 },
+            { text: "当发现某个解题方法可以作为“秒杀大招”时，我倾向于不加证明地在考试中使用之。", axis: 'A', dir: 1 },
             { text: "我认为数学证明的“简洁”和“美感”有时比证明的“正确性”更直击本质。", axis: 'I', dir: 1 },
-            { text: "面对一个抽象的代数结构，我必须手动构造出几个具体的例子才能真正理解它。", axis: 'C', dir: 1 }, // 偏C构造
+            { text: "面对一个抽象的代数结构，我必须手动构造出几个具体的例子才能真正理解它。", axis: 'C', dir: 1 },
             { text: "数学的尽头是无意义的符号游戏，所有的公理系统最终都会陷入不完备，追求绝对真理不过是徒劳。", axis: 'N', dir: 1 },
-            { text: "我认为数学的学习不能脱离物理实际，不能应用的数学是没有意义的。", axis: 'A', dir: 1 } // 偏A实际
+            { text: "我认为数学的学习不能脱离物理实际，不能应用的数学是没有意义的。", axis: 'A', dir: 1 }
         ];
 
         const stage2Questions = [
@@ -242,13 +239,13 @@
                     { t: "B. 统计或算法——别逗你纯数哥哥笑了,看看大部分学数学的最后跑哪去了。", s: { A: 2, C: 1 } },
                     { t: "C. 金融或量化——原来你们的工资是这样的吗,在我这里可以另外一幅模样呢。视频我已经拍好了,承受能力强的话就点开来看吧~", s: { A: 2 } },
                     { t: "D. Ai——数学已死,ai当立,岁在甲子,天下大吉!——大吉在哪?人类文明恐怕已经凶多吉少了!", s: { N: 1, A: 1 } },
-                    { t: "E. 开辅导班——学好数学就是学好数分高代,来报班国一孵蛋兜底!", s: { A: 2, R: 1 } }
+                    { t: "E. 开辅导班——学好数学就是学好数分高代,来报班国一孵蛋兜底!", s: { A: 2, R: 1, N: 1 } }
                 ]
             },
             {
                 q: "2. 纯数学中,你喜欢什么方向",
                 options: [
-                    { t: "A. 代数几何——概型启动!数学原神牛逼!", s: { S: 2, P: 1 } },
+                    { t: "A. 代数几何——概型启动!数学原神牛逼!", s: { S: 2, P: 1, N: 1 } },
                     { t: "B. 偏微分方程——到底是谁说天天就只在算积分解方程的,难道不得先确定这个方程可不可解、有没有解析解吗?", s: { C: 2, R: 1 } },
                     { t: "C. 几何分析——这是一个上等的方向!", s: { S: 1, C: 1 } },
                     { t: "D. 朗兰兹纲领——代数几何、调和分析、表示论的交叉,我们数学也有自己的大一统理论!", s: { S: 2, P: 2 } },
@@ -258,11 +255,11 @@
             {
                 q: "3. 当你在图书馆为即将到来的数分高代月考而发愁时,发现旁边有位和你同级的同学正津津有味地看着《抽象代数》,你的做法是:",
                 options: [
-                    { t: "A. 把月考丢在一边,一起讨论抽象代数问题", s: { P: 1, S: 1 } },
-                    { t: "B. 抽象代数算什么,这下不得不拿出我的《同调代数》了", s: { S: 2, P: 1 } },
+                    { t: "A. 把月考丢在一边,一起讨论抽象代数问题", s: { P: 1, S: 1, N: 1 } },
+                    { t: "B. 抽象代数算什么,这下不得不拿出我的《同调代数》了", s: { S: 2, P: 1, N: 2 } },
                     { t: "C. 找一个合适的时机打招呼,并虚心地请教一些考试的问题", s: { R: 1, A: 1 } },
                     { t: "D. 无所谓,又不是数分高代,到时候月考和cmc就老实了", s: { C: 1 } },
-                    { t: "E. 瞟一眼草稿纸,一秒看出上面的一个伪证然后指出来", s: { R: 2, I: 1 } }
+                    { t: "E. 瞟一眼草稿纸,一秒看出上面的一个伪证然后指出来", s: { R: 2, I: 1, N: 1 } }
                 ]
             },
             {
@@ -279,10 +276,10 @@
                 q: "5. 当你忙碌了一天发现什么也没有忙碌,晚上躺在床上打开知乎看到自己关注的一位数学系博士的抽象发电小短文,你的反应是:",
                 options: [
                     { t: "A. 狠狠共情,在底下评论“深度好文!不愧是数学系博士!!”", s: { N: 1, P: 1 } },
-                    { t: "B. 这种也就图一乐,在底下接龙“浅度坏理!是愧不物理系硕士!!”", s: { I: 1 } },
+                    { t: "B. 这种也就图一乐,在底下接龙“浅度坏理!是愧不物理系硕士!!”", s: { I: 1, N: 1 } },
                     { t: "C. 尝试从荒诞的文字中找到些许研究的灵感", s: { S: 1, P: 1 } },
                     { t: "D. 非常担心和焦虑,仿佛看到了自己的未来", s: { N: 2 } },
-                    { t: "E. 事已至此,先睡觉吧", s: { A: 1 } }
+                    { t: "E. 事已至此,先睡觉吧", s: { A: 1, N: 1 } }
                 ]
             },
             {
@@ -298,9 +295,9 @@
             {
                 q: "7. 你对数学建模大赛的态度如何",
                 options: [
-                    { t: "A. 这不是全国大学生调包和调教ai大赛吗?数学建模一定要有数学,建议踢出数学籍!", s: { P: 2 } },
-                    { t: "B. 这才是应该办的竞赛!能培养在现实中运用数学的能力,比那什么幽默的丘赛好多了", s: { A: 2 } },
-                    { t: "C. 我准备了A、B两个选项的说辞,具体选什么取决于评论区的风向", s: { N: 1 } },
+                    { t: "A. 这不是全国大学生调包和调教ai大赛吗?数学建模一定要有数学,建议踢出数学籍!", s: { P: 2, N: 1 } },
+                    { t: "B. 这才是应该办的竞赛!能培养在现实中运用数学的能力,比那什么幽默的丘赛好多了", s: { A: 2, N: 1 } },
+                    { t: "C. 我准备了A、B两个选项的说辞,具体选什么取决于评论区的风向", s: { N: 4 } },
                     { t: "D. 数学建模大赛肯定有其举办的意义,丘赛也不赖。应数不能没有纯数的理论基础,纯数也不能完全脱离实际", s: { R: 1, A: 1 } },
                     { t: "E. 怎么同时有正反方、两面派和理中客啊!闹麻了,这问题和我这种误入数学专业只想混个毕业证的有啥关系?", s: { N: 3 } }
                 ]
@@ -338,8 +335,8 @@
             {
                 q: "11. 做完了本次测试,你有什么对作者想说的话",
                 options: [
-                    { t: "A. 非常好测试,使我大脑旋转", s: { I: 1 } },
-                    { t: "B. 这是一份上等的问卷!", s: { P: 1 } },
+                    { t: "A. 非常好测试,使我大脑旋转", s: { I: 1, N: 1 } },
+                    { t: "B. 这是一份上等的问卷!", s: { P: 1, N: 1 } },
                     { t: "C. 何意味,给我气笑了", s: { N: 1 } },
                     { t: "D. 怀疑作者的精神状态,我得远离学数学的", s: { N: 2 } },
                     { t: "E. 喵~", s: { N: 3 } }
@@ -382,7 +379,6 @@
 
         // --- 逻辑校验：进入第二阶段 ---
         function goToStageTwoLoading() {
-            // 校验第一阶段是否全答完
             for(let i=0; i<stage1Questions.length; i++) {
                 if(!document.querySelector(`input[name="q1_${i}"]:checked`)) {
                     alert("还有题目没做完喵~");
@@ -450,7 +446,6 @@
             }
         }
 
-        // --- 逻辑校验：阶段二切换 ---
         function changeStage2Page(step) {
             if (step === 1) {
                 if(!s2Storage[currentS2Index] || s2Storage[currentS2Index].length === 0) {
@@ -468,7 +463,6 @@
             window.scrollTo(0,0);
         }
 
-        // --- 提交并计算器动画 ---
         function submitTest() {
             if(!s2Storage[currentS2Index] || s2Storage[currentS2Index].length === 0) {
                 alert("还有题目没做完喵~");
@@ -479,7 +473,6 @@
             const loadPage = document.getElementById('calc-loading');
             loadPage.style.display = 'flex';
             
-            // 进度条动画
             setTimeout(() => { document.getElementById('calc-bar').style.width = '100%'; }, 100);
 
             setTimeout(() => {
@@ -500,12 +493,11 @@
                 if (actualVal > 0) {
                     total[q.axis] += actualVal;
                 } else if (actualVal < 0) {
-                    // 扣分代表投给对立轴
                     let opp = '';
                     if(q.axis === 'I') opp = 'R';
                     if(q.axis === 'S') opp = 'C';
                     if(q.axis === 'P') opp = 'A';
-                    if(q.axis === 'N') continue; // N没有严格对立面
+                    if(q.axis === 'N') continue;
                     total[opp] += Math.abs(actualVal);
                 }
             }
@@ -522,8 +514,6 @@
             }
 
             // 3. 维度判定
-            // 为了让分布更均匀，加入阈值平衡偏移(Threshold Offset)
-            // 原始倾向中，I, S, P 往往偏高。
             let diff_IR = total.I - total.R; 
             let diff_SC = total.S - total.C; 
             let diff_PA = total.P - total.A; 
@@ -535,7 +525,6 @@
             let code = res_D1 + res_D2 + res_D3;
             let nScore = total.N;
 
-            // 4. 文案库 (完全采用你提供的 SBTI 风格库)
             const resLib = {
                 "ISP": { 
                     c: "I-S (理想空间)", e: "Ideal Space Projection (理想空间投影)", f: "$$\\mathcal{F}: \\text{Sch} \\to \\text{Sets}$$",
@@ -581,20 +570,18 @@
 
             let finalData = resLib[code];
 
-            // 5. N值判定 (3个程度) -> 调整阈值使最后一级稀有
+            // 5. N值判定 (调整阈值，使得 Level 3 频率约为 10%)
             let nTag = "", nDesc = "";
             let isChaos = false;
 
-            if (nScore < 8) {
+            if (nScore < 18) {
                 nTag = "精神状态等级 1：守序凡人";
                 nDesc = "你的精神状态极其稳定，未被过度侵蚀。逻辑自洽，适合继续脚踏实地地推算公式。";
-            } else if (nScore < 15) {
+            } else if (nScore < 32) {
                 nTag = "精神状态等级 2：$\\emptyset$ (空集观察者)";
                 nDesc = "<strong>代码扩写： Non-existent Null Nexus (不存在的零点纽带)</strong><br><br>恭喜（或遗憾），你看穿了数学作为符号游戏的本质。虽然你还在继续“非平凡解”的追寻，但你深知这一切最终都会消解在哥德尔的幽灵里。";
             } else {
-                // 第三级别：极端思想混沌/疯癫
                 if (code === "ISP") {
-                    // 彩蛋：ISP + N3
                     nTag = "⚠️ 精神状态特异点：格罗滕迪克彩蛋触发";
                     nDesc = "你的精神状态已经到了非常混沌、颠覆的极限程度。你不再是为了解题而学习，你试图用另一种维度的语言去重新定义现实。你是逻辑虚无中那个唯一的立法者。";
                     isChaos = true;
@@ -606,11 +593,10 @@
 
             // 渲染结果
             document.getElementById('res-code').innerText = finalData.c;
-            document.getElementById('res-title').innerText = `[${code}] 人格映射`;
             document.getElementById('res-expansion').innerText = finalData.e;
             document.getElementById('res-formula').innerHTML = finalData.f;
-            document.getElementById('desc-fun').innerText = finalData.fun;
-            document.getElementById('desc-trait').innerText = finalData.trait;
+            // 将两段描述合并
+            document.getElementById('res-desc-combined').innerText = finalData.fun + " " + finalData.trait;
             
             document.getElementById('mental-tag').innerText = nTag;
             document.getElementById('mental-desc').innerHTML = nDesc;
